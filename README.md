@@ -86,8 +86,8 @@ dv2-tax-data-warehouse-using-medallion/
 ### Prerequisites
 
 - **SQL Server 2025** (Developer or Enterprise Edition)
-- **SQL Server Management Studio (SSMS)** 20+
-- **Visual Studio 2022** with SQL Server Integration Services (SSIS) extension
+- **SQL Server Management Studio (SSMS)** 2022
+- **Visual Studio 2026** with SQL Server Integration Services (SSIS 2022+) extension
 - Minimum 8 GB RAM, 20 GB free disk space
 
 ### Installation
@@ -235,7 +235,7 @@ Master_Complete_Pipeline.dtsx
 
 - **Database**: SQL Server 2025 Developer Edition (v17, RTM 17.0.1000.7)
 - **ETL**: SQL Server Integration Services (SSIS) 2022
-- **IDE**: Visual Studio 2022 Community + SSIS Extension
+- **IDE**: Visual Studio 2026 + SSIS 2022+ Extension
 - **OS**: Windows Server 2025 Datacenter (GCP VM)
 - **Methodology**: Data Vault 2.0 (Linstedt)
 - **Architecture**: Medallion (Staging → Bronze → Silver → Gold)
