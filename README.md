@@ -1,10 +1,10 @@
 # Data Vault 2.0 Tax System Data Warehouse Using Medallion Architecture
 
-[![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
+[![SQL Server](https://img.shields.io/badge/SQL%20Server-2025-CC2927?logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
 [![SSIS](https://img.shields.io/badge/SSIS-2022-5C2D91?logo=visualstudio&logoColor=white)](https://learn.microsoft.com/en-us/sql/integration-services/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Master's Thesis Implementation** — A complete Data Vault 2.0 data warehouse with medallion architecture (Staging → Bronze → Silver → Gold) for Cambodia's tax administration system, built on SQL Server 2022 and SSIS 2022.
+> **Master's Thesis Implementation** — A complete Data Vault 2.0 data warehouse with medallion architecture (Staging → Bronze → Silver → Gold) for Cambodia's tax administration system, built on SQL Server 2025 and SSIS 2022.
 
 ---
 
@@ -85,8 +85,8 @@ dv2-tax-data-warehouse-using-medallion/
 
 ### Prerequisites
 
-- **SQL Server 2022** (Developer or Enterprise Edition)
-- **SQL Server Management Studio (SSMS)** 19+
+- **SQL Server 2025** (Developer or Enterprise Edition)
+- **SQL Server Management Studio (SSMS)** 20+
 - **Visual Studio 2022** with SQL Server Integration Services (SSIS) extension
 - Minimum 8 GB RAM, 20 GB free disk space
 
@@ -233,12 +233,13 @@ Master_Complete_Pipeline.dtsx
 
 ## 🔧 Technology Stack
 
-- **Database**: SQL Server 2022 (v16)
+- **Database**: SQL Server 2025 Developer Edition (v17, RTM 17.0.1000.7)
 - **ETL**: SQL Server Integration Services (SSIS) 2022
-- **IDE**: Visual Studio 2022 + SSIS Extension
+- **IDE**: Visual Studio 2022 Community + SSIS Extension
+- **OS**: Windows Server 2025 Datacenter (GCP VM)
 - **Methodology**: Data Vault 2.0 (Linstedt)
 - **Architecture**: Medallion (Staging → Bronze → Silver → Gold)
-- **Deployment**: Google Cloud Platform VM (e2-standard-4)
+- **Deployment**: Google Cloud Platform VM (e2-standard-4, 4 vCPU / 16 GB RAM)
 - **Hash Algorithm**: SHA2_256 for Hub keys and Satellite HashDiff
 
 ---
