@@ -34,7 +34,6 @@ This repository contains the full implementation of a proof-of-concept data ware
 | Query Speedup (Gold vs Raw Vault) | 1.03× – 8.3× |
 | Total Database Objects | 50 tables across 6 databases |
 | SSIS Packages | 49 child packages + 3 master packages |
-| Stored Procedures | 15 orchestration procedures |
 
 ---
 
@@ -48,12 +47,7 @@ dv2-tax-data-warehouse-using-medallion/
 │   ├── 01_CreateDatabaseStructure.sql     # Source database (TaxSystemDB) DDL
 │   ├── 02_TransactionData.sql             # Simulated tax data (1,000 taxpayers)
 │   ├── 03_ETL_Control_Setup.sql           # ETL Control framework (logging, watermarks)
-│   ├── 04_DDL_Architecture_DW.sql         # Data warehouse DDL (Staging/Bronze/Silver/Gold)
-│   ├── 05_ETL_Staging_Procedures.sql      # Staging layer helper procedures
-│   ├── 06_ETL_Bronze_Procedures.sql       # Bronze layer (Hub/Satellite/Link) procedures
-│   ├── 07_ETL_Silver_Procedures.sql       # Silver layer (PIT/Bridge/Business) procedures
-│   ├── 08_ETL_Gold_Procedures.sql         # Gold layer (Dimension/Fact) procedures
-│   └── 09_ETL_Master_Orchestration.sql    # Master ETL (Full + Incremental load)
+│   └── 04_DDL_Architecture_DW.sql         # Data warehouse DDL (Staging/Bronze/Silver/Gold)
 │
 ├── verification/                          # Testing and validation scripts
 │   ├── 10_Verify_FullLoad.sql             # Full load verification queries
@@ -105,29 +99,24 @@ sqlcmd -S localhost -i sql-scripts/03_ETL_Control_Setup.sql
 # Step 3: Create data warehouse databases (Staging, Bronze, Silver, Gold)
 sqlcmd -S localhost -i sql-scripts/04_DDL_Architecture_DW.sql
 
-# Step 4: Create stored procedures for all layers
-sqlcmd -S localhost -i sql-scripts/05_ETL_Staging_Procedures.sql
-sqlcmd -S localhost -i sql-scripts/06_ETL_Bronze_Procedures.sql
-sqlcmd -S localhost -i sql-scripts/07_ETL_Silver_Procedures.sql
-sqlcmd -S localhost -i sql-scripts/08_ETL_Gold_Procedures.sql
-
-# Step 5: Create master orchestration procedures
-sqlcmd -S localhost -i sql-scripts/09_ETL_Master_Orchestration.sql
+# Step 4: Build and run SSIS packages (see ssis-guide/)
 ```
 
 ### Running the ETL Pipeline
 
-```sql
--- Full Load (first-time load of all data)
-USE ETL_Control;
-EXEC dbo.usp_MasterETL_FullLoad;
+The ETL pipeline is executed entirely through **SSIS packages** in Visual Studio:
 
--- Incremental Load (delta changes only)
--- First, apply test changes:
---   Run: verification/12_IncrementalTest_SourceChanges.sql
--- Then:
-EXEC dbo.usp_MasterETL_IncrementalLoad;
-```
+1. **Full Load** (first-time load of all data)
+   - Open the SSIS solution in Visual Studio
+   - Run `Master_Complete_Pipeline.dtsx` → selects the Full Load path
+   - All 49 steps execute across Staging → Bronze → Silver → Gold
+
+2. **Incremental Load** (delta changes only)
+   - Apply test changes first: run `verification/12_IncrementalTest_SourceChanges.sql` in SSMS
+   - Run `Master_Complete_Pipeline.dtsx` → selects the Incremental Load path
+   - Watermark-based delta extraction processes only changed records
+
+> See `ssis-guide/Technical_Implementation_Guide.docx` for complete step-by-step package build instructions.
 
 ### Verifying Results
 
@@ -168,9 +157,9 @@ EXEC dbo.usp_MasterETL_IncrementalLoad;
 ### ETL Control Framework
 
 - **Batch-level logging**: Every ETL run tracked with BatchID, status, record counts
-- **Step-level logging**: Each of 49 steps individually tracked with TRY-CATCH
+- **Step-level logging**: Each of 49 steps individually tracked
 - **Watermark-based incremental**: Per-table watermarks for delta extraction
-- **Error handling**: Centralized error logging with severity classification
+- **Error handling**: Centralized error logging with severity classification (SSIS OnError Event Handler)
 - **Configuration table**: Runtime-configurable parameters (retry attempts, thresholds)
 
 ### SSIS Package Hierarchy
