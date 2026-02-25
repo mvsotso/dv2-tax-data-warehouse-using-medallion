@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="CM_DV_Silver"
+  DTS:DTSID="{E1D3DF6D-4654-40F3-B9E6-48B87D63B7BE}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectRetryCount="1"
+      DTS:ConnectRetryInterval="5"
+      DTS:ConnectionString="Data Source=dv2-tax-system;Initial Catalog=DV_Silver;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;Application Name=SSIS-DataVaultDWH_TaxSystem-{E1D3DF6D-4654-40F3-B9E6-48B87D63B7BE}SOTSO-PC.DV_Silver;" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

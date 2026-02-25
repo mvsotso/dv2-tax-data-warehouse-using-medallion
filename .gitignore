@@ -1,0 +1,29 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Visual Studio / SSIS
+.vs/
+*.user
+*.suo
+*.cache
+bin/
+obj/
+*.dtproj.user
+
+# SQL Server
+*.mdf
+*.ldf
+*.bak
+*.trn
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# IDE
+.idea/
+*.swp
+*.swo

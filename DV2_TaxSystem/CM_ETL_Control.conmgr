@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="CM_ETL_Control"
+  DTS:DTSID="{B7A338C3-8C44-4E6C-BD78-3DEE9D4318C1}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectRetryCount="1"
+      DTS:ConnectRetryInterval="5"
+      DTS:ConnectionString="Data Source=dv2-tax-system;Initial Catalog=ETL_Control;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;Application Name=SSIS-DataVaultDWH_TaxSystem-{B7A338C3-8C44-4E6C-BD78-3DEE9D4318C1}SOTSO-PC.ETL_Control;" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

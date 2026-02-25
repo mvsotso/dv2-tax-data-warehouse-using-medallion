@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="CM_TaxSystemDB"
+  DTS:DTSID="{26188249-83E9-4B6F-9532-2C0EB82D15E0}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectRetryCount="1"
+      DTS:ConnectRetryInterval="5"
+      DTS:ConnectionString="Data Source=dv2-tax-system;Initial Catalog=TaxSystemDB;Provider=SQLOLEDB.1;Integrated Security=SSPI;Auto Translate=False;Application Name=SSIS-DataVaultDWH_TaxSystem-{26188249-83E9-4B6F-9532-2C0EB82D15E0}SOTSO-PC.TaxSystemDB;" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

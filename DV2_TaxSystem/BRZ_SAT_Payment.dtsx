@@ -1,0 +1,2968 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="2/17/2026 7:54:23 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="SOTSO-PC"
+  DTS:CreatorName="SOTSO-PC\Dell"
+  DTS:DTSID="{F7B972DB-F1CB-4C81-88FA-59989B00DC43}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="17.0.1010.2"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="BRZ_SAT_Payment"
+  DTS:PackageType="5"
+  DTS:VersionBuild="89"
+  DTS:VersionGUID="{A8A19027-D01A-4EF9-8772-3271ACC940C8}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:PackageParameters>
+    <DTS:PackageParameter
+      DTS:CreationName=""
+      DTS:DataType="3"
+      DTS:Description="Current batch identifier"
+      DTS:DTSID="{4362445A-CC36-4446-9E56-B75DFCBBBAA4}"
+      DTS:ObjectName="p_BatchID"
+      DTS:Required="True">
+      <DTS:Property
+        DTS:DataType="3"
+        DTS:Name="ParameterValue">0</DTS:Property>
+    </DTS:PackageParameter>
+  </DTS:PackageParameters>
+  <DTS:Variables>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:Description="Error details captured by OnError handler"
+      DTS:DTSID="{00432E58-DC51-4E17-B4C2-BB4C442C9E0C}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="v_ErrorMessage">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:Description="Auto-set via expression: @[System::PackageName]. No manual change needed."
+      DTS:DTSID="{863C7FFB-D042-43B2-8183-1BE6E5193580}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[System::PackageName]"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="v_ErrorSource">
+      <DTS:VariableValue
+        DTS:DataType="8">BRZ_SAT_Payment</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:Description="Rows inserted by the Hub SP"
+      DTS:DTSID="{44969A53-78DC-4899-8AF6-B3F2FB617C59}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="v_RowCount">
+      <DTS:VariableValue
+        DTS:DataType="3">0</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:Description="Step tracking ID from usp_StartStep OUTPUT"
+      DTS:DTSID="{42FC073E-1BEC-40AE-A0AE-C98C895B8DD0}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="v_StepID">
+      <DTS:VariableValue
+        DTS:DataType="3">0</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:Description="Auto: &quot;Load_SAT_&quot; + @[User::v_TableName]"
+      DTS:DTSID="{4298E613-E729-493D-B86C-39F44A579256}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="&quot;Load_SAT_&quot; + @[User::v_TableName]"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="v_StepName">
+      <DTS:VariableValue
+        DTS:DataType="8">Load_SAT_Payment</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:Description="Entity name — drives all dynamic expressions (CHANGE THIS PER PACKAGE)"
+      DTS:DTSID="{38F1102F-DDC3-4604-BF7B-FA7FC030DDA2}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="v_TableName">
+      <DTS:VariableValue
+        DTS:DataType="8">Payment</DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\DFT_Load_Sat"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Data Flow Task"
+      DTS:DTSID="{633584F5-52D7-4AB6-AAC7-CBF691F87C79}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="DFT_Load_Sat"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\DFT_Load_Sat\CMD_EndDate"
+              componentClassID="Microsoft.OLEDBCommand"
+              contactInfo="OLE DB Command;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;2"
+              description="Runs an SQL statement for each row in a data flow. For example, call a 'new employee setup' stored procedure for each row in the 'new employees' table. Note: running an SQL statement for each row of a large data flow may take a long time."
+              name="CMD_EndDate"
+              usesDispositions="true"
+              version="2">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  expressionType="Notify"
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">UPDATE DV_Bronze.dbo.SAT_Payment
+SET    SAT_EndDate = GETDATE()
+WHERE  HUB_Payment_HK = ?
+AND    SAT_EndDate IS NULL
+AND    SAT_HashDiff = ?</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\DFT_Load_Sat\CMD_EndDate.Connections[OleDbConnection]"
+                  connectionManagerID="{67CB39FD-70EC-4AF3-82B4-AD5E0D17618F}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[CM_DV_Bronze]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input]"
+                  errorOrTruncationOperation="Command Execution"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Command Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input].Columns[HUB_Payment_HK]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="HUB_Payment_HK"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input].ExternalColumns[Param_0]"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[HUB_Payment_HK]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input].Columns[LKP_HashDiff]"
+                      cachedDataType="bytes"
+                      cachedLength="32"
+                      cachedName="LKP_HashDiff"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input].ExternalColumns[Param_1]"
+                      lineageId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Match Output].Columns[LKP_HashDiff]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input].ExternalColumns[Param_0]"
+                      dataType="bytes"
+                      length="32"
+                      name="Param_0">
+                      <properties>
+                        <property
+                          dataType="System.Int32"
+                          description="Parameter information.  Matches OLE DB's DBPARAMFLAGSENUM values."
+                          name="DBParamInfoFlags">1</property>
+                      </properties>
+                    </externalMetadataColumn>
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input].ExternalColumns[Param_1]"
+                      dataType="bytes"
+                      length="32"
+                      name="Param_1">
+                      <properties>
+                        <property
+                          dataType="System.Int32"
+                          description="Parameter information.  Matches OLE DB's DBPARAMFLAGSENUM values."
+                          name="DBParamInfoFlags">1</property>
+                      </properties>
+                    </externalMetadataColumn>
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\DFT_Load_Sat\CMD_EndDate.Outputs[OLE DB Command Output]"
+                  exclusionGroup="1"
+                  name="OLE DB Command Output"
+                  synchronousInputId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input]">
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\DFT_Load_Sat\CMD_EndDate.Outputs[OLE DB Command Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Command Error Output"
+                  synchronousInputId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\CMD_EndDate.Outputs[OLE DB Command Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\CMD_EndDate.Outputs[OLE DB Command Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\CMD_EndDate.Outputs[OLE DB Command Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\CMD_EndDate.Outputs[OLE DB Command Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\DFT_Load_Sat\CSPL_DetectChanges"
+              componentClassID="Microsoft.ConditionalSplit"
+              contactInfo="Conditional Split;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Routes data rows to different outputs depending on the content of the data. Use conditions (SSIS expressions) to specify which rows are routed. For example, separate records that need to be cleaned from those that are ready to be loaded or route only a subset of records."
+              name="CSPL_DetectChanges"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\DFT_Load_Sat\CSPL_DetectChanges.Inputs[Conditional Split Input]"
+                  description="Input to the Conditional Split Transformation"
+                  name="Conditional Split Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\CSPL_DetectChanges.Inputs[Conditional Split Input].Columns[SAT_HashDiff]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="SAT_HashDiff"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_HashDiff]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\CSPL_DetectChanges.Inputs[Conditional Split Input].Columns[LKP_HashDiff]"
+                      cachedDataType="bytes"
+                      cachedLength="32"
+                      cachedName="LKP_HashDiff"
+                      lineageId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Match Output].Columns[LKP_HashDiff]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\DFT_Load_Sat\CSPL_DetectChanges.Outputs[Changed]"
+                  description="Output 1 of the Conditional Split Transformation"
+                  errorOrTruncationOperation="Computation"
+                  errorRowDisposition="FailComponent"
+                  exclusionGroup="1"
+                  name="Changed"
+                  synchronousInputId="Package\DFT_Load_Sat\CSPL_DetectChanges.Inputs[Conditional Split Input]"
+                  truncationRowDisposition="FailComponent">
+                  <properties>
+                    <property
+                      containsID="true"
+                      dataType="System.String"
+                      description="Specifies the expression. This expression version uses lineage identifiers instead of column names."
+                      name="Expression">(DT_WSTR,66)#{Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_HashDiff]} != (DT_WSTR,66)#{Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Match Output].Columns[LKP_HashDiff]}</property>
+                    <property
+                      containsID="true"
+                      dataType="System.String"
+                      description="Specifies the friendly version of the expression. This expression version uses column names."
+                      expressionType="Notify"
+                      name="FriendlyExpression">(DT_WSTR,66)SAT_HashDiff != (DT_WSTR,66)LKP_HashDiff</property>
+                    <property
+                      dataType="System.Int32"
+                      description="Specifies the position of the condition in the list of conditions that the transformation evaluates. The evaluation order is from the lowest to the highest value."
+                      name="EvaluationOrder">0</property>
+                  </properties>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\DFT_Load_Sat\CSPL_DetectChanges.Outputs[Conditional Split Default Output]"
+                  description="Default Output of the Conditional Split Transformation"
+                  exclusionGroup="1"
+                  name="Conditional Split Default Output"
+                  synchronousInputId="Package\DFT_Load_Sat\CSPL_DetectChanges.Inputs[Conditional Split Input]">
+                  <properties>
+                    <property
+                      dataType="System.Boolean"
+                      name="IsDefaultOut">true</property>
+                  </properties>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\DFT_Load_Sat\CSPL_DetectChanges.Outputs[Conditional Split Error Output]"
+                  description="Error Output of the Conditional Split Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Conditional Split Error Output"
+                  synchronousInputId="Package\DFT_Load_Sat\CSPL_DetectChanges.Inputs[Conditional Split Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\CSPL_DetectChanges.Outputs[Conditional Split Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\CSPL_DetectChanges.Outputs[Conditional Split Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\CSPL_DetectChanges.Outputs[Conditional Split Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\CSPL_DetectChanges.Outputs[Conditional Split Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\DFT_Load_Sat\LKP_SAT"
+              componentClassID="Microsoft.Lookup"
+              contactInfo="Lookup;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;6"
+              description="Joins additional columns to the data flow by looking up values in a table. For example, join to the 'employee id' column the employees table to get 'hire date' and 'employee name'. We recommend this transformation when the lookup table can fit into memory."
+              name="LKP_SAT"
+              usesDispositions="true"
+              version="6">
+              <properties>
+                <property
+                  dataType="System.String"
+                  description="Specifies the SQL statement that generates the lookup table."
+                  expressionType="Notify"
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT HUB_Payment_HK, SAT_HashDiff
+FROM DV_Bronze.dbo.SAT_Payment
+WHERE SAT_EndDate IS NULL</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies a SQL statement that uses parameters to generate the lookup table."
+                  expressionType="Notify"
+                  name="SqlCommandParam"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">select * from (SELECT HUB_Payment_HK, SAT_HashDiff
+FROM DV_Bronze.dbo.SAT_Payment
+WHERE SAT_EndDate IS NULL) [refTable]
+where [refTable].[HUB_Payment_HK] = ?</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the type of connection used to access the reference dataset."
+                  name="ConnectionType"
+                  typeConverter="LookupConnectionType">0</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the cache type of the lookup table."
+                  name="CacheType"
+                  typeConverter="CacheType">0</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
+                  name="NoMatchBehavior"
+                  typeConverter="LookupNoMatchBehavior">1</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
+                  name="NoMatchCachePercentage">0</property>
+                <property
+                  dataType="System.Int32"
+                  description="Maximum Memory Usage for Reference Cache on a 32 bit platform."
+                  name="MaxMemoryUsage">25</property>
+                <property
+                  dataType="System.Int64"
+                  description="Maximum Memory Usage for Reference Cache on a 64 bit platform."
+                  name="MaxMemoryUsage64">25</property>
+                <property
+                  dataType="System.String"
+                  description="Indicates whether to reference metadata in an XML format."
+                  name="ReferenceMetadataXml">&lt;referenceMetadata&gt;&lt;referenceColumns&gt;&lt;referenceColumn name="HUB_Payment_HK" dataType="DT_BYTES" length="32" precision="0" scale="0" codePage="0"/&gt;&lt;referenceColumn name="SAT_HashDiff" dataType="DT_BYTES" length="32" precision="0" scale="0" codePage="0"/&gt;&lt;/referenceColumns&gt;&lt;/referenceMetadata&gt;</property>
+                <property
+                  containsID="true"
+                  dataType="System.String"
+                  description="Specifies the list of lineage identifiers that map to the parameters that the SQL statement in the SQLCommand property uses. Entries in the list are separated by semicolons."
+                  name="ParameterMap">#{Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[HUB_Payment_HK]};</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Determines whether duplicate keys in the reference data should be treated as errors when full cache mode is used."
+                  name="TreatDuplicateKeysAsError">false</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\DFT_Load_Sat\LKP_SAT.Connections[OleDbConnection]"
+                  connectionManagerID="{67CB39FD-70EC-4AF3-82B4-AD5E0D17618F}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[CM_DV_Bronze]"
+                  description="Connection manager used to access lookup data."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\DFT_Load_Sat\LKP_SAT.Inputs[Lookup Input]"
+                  name="Lookup Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\LKP_SAT.Inputs[Lookup Input].Columns[HUB_Payment_HK]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="HUB_Payment_HK"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[HUB_Payment_HK]">
+                      <properties>
+                        <property
+                          dataType="System.String"
+                          description="Specifies the column in the reference table that a column joins."
+                          name="JoinToReferenceColumn">HUB_Payment_HK</property>
+                        <property
+                          dataType="System.Null"
+                          description="Specifies the column in the reference table from which a column is copied."
+                          name="CopyFromReferenceColumn" />
+                      </properties>
+                    </inputColumn>
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Match Output]"
+                  errorOrTruncationOperation="Lookup"
+                  exclusionGroup="1"
+                  name="Lookup Match Output"
+                  synchronousInputId="Package\DFT_Load_Sat\LKP_SAT.Inputs[Lookup Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Match Output].Columns[LKP_HashDiff]"
+                      dataType="bytes"
+                      errorOrTruncationOperation="Copy Column"
+                      length="32"
+                      lineageId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Match Output].Columns[LKP_HashDiff]"
+                      name="LKP_HashDiff"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.String"
+                          description="Specifies the column in the reference table from which a column is copied."
+                          name="CopyFromReferenceColumn">SAT_HashDiff</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup No Match Output]"
+                  description="The Lookup output that handles rows with no matching entries in the reference dataset. Use this output when the NoMatchBehavior property is set to &quot;Send rows with no matching entries to the no match output.&quot;"
+                  exclusionGroup="1"
+                  name="Lookup No Match Output"
+                  synchronousInputId="Package\DFT_Load_Sat\LKP_SAT.Inputs[Lookup Input]">
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Lookup Error Output"
+                  synchronousInputId="Package\DFT_Load_Sat\LKP_SAT.Inputs[Lookup Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\DFT_Load_Sat\MULTI_Changed"
+              componentClassID="Microsoft.Multicast"
+              contactInfo="Multicast;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Distributes every input row to every row in one or more outputs. For example, branch your data flow to make a copy of data so that some values can be masked before sharing with external partners."
+              name="MULTI_Changed">
+              <inputs>
+                <input
+                  refId="Package\DFT_Load_Sat\MULTI_Changed.Inputs[Multicast Input 1]"
+                  name="Multicast Input 1">
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\DFT_Load_Sat\MULTI_Changed.Outputs[Multicast Output 1]"
+                  deleteOutputOnPathDetached="true"
+                  name="Multicast Output 1"
+                  synchronousInputId="Package\DFT_Load_Sat\MULTI_Changed.Inputs[Multicast Input 1]">
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\DFT_Load_Sat\MULTI_Changed.Outputs[Multicast Output 2]"
+                  deleteOutputOnPathDetached="true"
+                  name="Multicast Output 2"
+                  synchronousInputId="Package\DFT_Load_Sat\MULTI_Changed.Inputs[Multicast Input 1]">
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\DFT_Load_Sat\MULTI_Changed.Outputs[Multicast Output 3]"
+                  dangling="true"
+                  deleteOutputOnPathDetached="true"
+                  name="Multicast Output 3"
+                  synchronousInputId="Package\DFT_Load_Sat\MULTI_Changed.Inputs[Multicast Input 1]">
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\DFT_Load_Sat\OLE_DST"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE_DST"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[SAT_Payment]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\DFT_Load_Sat\OLE_DST.Connections[OleDbConnection]"
+                  connectionManagerID="{67CB39FD-70EC-4AF3-82B4-AD5E0D17618F}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[CM_DV_Bronze]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[HUB_Payment_HK]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="HUB_Payment_HK"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[HUB_Payment_HK]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[HUB_Payment_HK]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[SAT_LoadDate]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="SAT_LoadDate"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[SAT_LoadDate]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_LoadDate]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[SAT_HashDiff]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="SAT_HashDiff"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[SAT_HashDiff]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_HashDiff]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[SAT_RecordSource]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="SAT_RecordSource"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[SAT_RecordSource]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_RecordSource]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[TaxpayerID]"
+                      cachedDataType="i4"
+                      cachedName="TaxpayerID"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[TaxpayerID]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[TaxpayerID]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[DeclarationID]"
+                      cachedDataType="i4"
+                      cachedName="DeclarationID"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[DeclarationID]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[DeclarationID]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[AnnualDeclarationID]"
+                      cachedDataType="i4"
+                      cachedName="AnnualDeclarationID"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[AnnualDeclarationID]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[AnnualDeclarationID]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[PaymentAmount]"
+                      cachedDataType="numeric"
+                      cachedName="PaymentAmount"
+                      cachedPrecision="18"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[PaymentAmount]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentAmount]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[PaymentDate]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="PaymentDate"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[PaymentDate]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentDate]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[PaymentMethod]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="PaymentMethod"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[PaymentMethod]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentMethod]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[ReferenceNumber]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="100"
+                      cachedName="ReferenceNumber"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[ReferenceNumber]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[ReferenceNumber]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[Status]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="Status"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[Status]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[Status]" />
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].Columns[IsActive]"
+                      cachedDataType="bool"
+                      cachedName="IsActive"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[IsActive]"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[IsActive]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[HUB_Payment_HK]"
+                      dataType="bytes"
+                      length="32"
+                      name="HUB_Payment_HK" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[SAT_LoadDate]"
+                      dataType="dbTimeStamp"
+                      name="SAT_LoadDate" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[SAT_EndDate]"
+                      dataType="dbTimeStamp"
+                      name="SAT_EndDate" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[SAT_HashDiff]"
+                      dataType="bytes"
+                      length="32"
+                      name="SAT_HashDiff" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[SAT_RecordSource]"
+                      dataType="wstr"
+                      length="50"
+                      name="SAT_RecordSource" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[TaxpayerID]"
+                      dataType="i4"
+                      name="TaxpayerID" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[DeclarationID]"
+                      dataType="i4"
+                      name="DeclarationID" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[AnnualDeclarationID]"
+                      dataType="i4"
+                      name="AnnualDeclarationID" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[PaymentAmount]"
+                      dataType="numeric"
+                      name="PaymentAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[PaymentDate]"
+                      dataType="wstr"
+                      length="10"
+                      name="PaymentDate" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[PaymentMethod]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="PaymentMethod" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[ReferenceNumber]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      name="ReferenceNumber" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[Status]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Status" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input].ExternalColumns[IsActive]"
+                      dataType="bool"
+                      name="IsActive" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\DFT_Load_Sat\OLE_DST.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\OLE_DST.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_DST.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\OLE_DST.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\DFT_Load_Sat\OLE_SRC"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE_SRC"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT
+    HASHBYTES('SHA2_256', CAST(stg.PaymentID AS NVARCHAR(MAX)))
+        AS HUB_Payment_HK,
+    GETDATE() AS SAT_LoadDate,
+    HASHBYTES('SHA2_256', CONCAT(
+        ISNULL(CAST(stg.TaxpayerID AS NVARCHAR(20)), ''), '|',
+        ISNULL(CAST(stg.DeclarationID AS NVARCHAR(20)), ''), '|',
+        ISNULL(CAST(stg.AnnualDeclarationID AS NVARCHAR(20)), ''), '|',
+        ISNULL(CAST(stg.PaymentAmount AS NVARCHAR(30)), ''), '|',
+        ISNULL(CAST(stg.PaymentDate AS NVARCHAR(30)), ''), '|',
+        ISNULL(stg.PaymentMethod, ''), '|',
+        ISNULL(stg.ReferenceNumber, ''), '|',
+        ISNULL(stg.Status, ''), '|',
+        ISNULL(CAST(stg.IsActive AS NVARCHAR(1)), '')
+    )) AS SAT_HashDiff,
+    stg.RecordSource AS SAT_RecordSource,
+    stg.TaxpayerID, stg.DeclarationID, stg.AnnualDeclarationID,
+    stg.PaymentAmount, stg.PaymentDate, stg.PaymentMethod,
+    stg.ReferenceNumber, stg.Status, stg.IsActive
+FROM DV_Staging.dbo.STG_Payment stg</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\DFT_Load_Sat\OLE_SRC.Connections[OleDbConnection]"
+                  connectionManagerID="{ED12D3AA-0563-48CD-A7D1-25678D7D5020}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[CM_DV_Staging]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[HUB_Payment_HK]"
+                      dataType="bytes"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[HUB_Payment_HK]"
+                      length="8000"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[HUB_Payment_HK]"
+                      name="HUB_Payment_HK"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_LoadDate]"
+                      dataType="dbTimeStamp"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[SAT_LoadDate]"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_LoadDate]"
+                      name="SAT_LoadDate"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_HashDiff]"
+                      dataType="bytes"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[SAT_HashDiff]"
+                      length="8000"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_HashDiff]"
+                      name="SAT_HashDiff"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_RecordSource]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[SAT_RecordSource]"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_RecordSource]"
+                      name="SAT_RecordSource"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[TaxpayerID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[TaxpayerID]"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[TaxpayerID]"
+                      name="TaxpayerID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[DeclarationID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[DeclarationID]"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[DeclarationID]"
+                      name="DeclarationID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[AnnualDeclarationID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[AnnualDeclarationID]"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[AnnualDeclarationID]"
+                      name="AnnualDeclarationID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[PaymentAmount]"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentAmount]"
+                      name="PaymentAmount"
+                      precision="18"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentDate]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[PaymentDate]"
+                      length="10"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentDate]"
+                      name="PaymentDate"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentMethod]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[PaymentMethod]"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentMethod]"
+                      name="PaymentMethod"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[ReferenceNumber]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[ReferenceNumber]"
+                      length="100"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[ReferenceNumber]"
+                      name="ReferenceNumber"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[Status]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[Status]"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[Status]"
+                      name="Status"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[IsActive]"
+                      dataType="bool"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[IsActive]"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[IsActive]"
+                      name="IsActive"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[HUB_Payment_HK]"
+                      dataType="bytes"
+                      length="8000"
+                      name="HUB_Payment_HK" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[SAT_LoadDate]"
+                      dataType="dbTimeStamp"
+                      name="SAT_LoadDate" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[SAT_HashDiff]"
+                      dataType="bytes"
+                      length="8000"
+                      name="SAT_HashDiff" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[SAT_RecordSource]"
+                      dataType="wstr"
+                      length="50"
+                      name="SAT_RecordSource" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[TaxpayerID]"
+                      dataType="i4"
+                      name="TaxpayerID" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[DeclarationID]"
+                      dataType="i4"
+                      name="DeclarationID" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[AnnualDeclarationID]"
+                      dataType="i4"
+                      name="AnnualDeclarationID" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[PaymentAmount]"
+                      dataType="numeric"
+                      name="PaymentAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[PaymentDate]"
+                      dataType="wstr"
+                      length="10"
+                      name="PaymentDate" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[PaymentMethod]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="PaymentMethod" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[ReferenceNumber]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      name="ReferenceNumber" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[Status]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Status" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].ExternalColumns[IsActive]"
+                      dataType="bool"
+                      name="IsActive" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[HUB_Payment_HK]"
+                      dataType="bytes"
+                      length="8000"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[HUB_Payment_HK]"
+                      name="HUB_Payment_HK" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[SAT_LoadDate]"
+                      dataType="dbTimeStamp"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[SAT_LoadDate]"
+                      name="SAT_LoadDate" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[SAT_HashDiff]"
+                      dataType="bytes"
+                      length="8000"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[SAT_HashDiff]"
+                      name="SAT_HashDiff" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[SAT_RecordSource]"
+                      dataType="wstr"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[SAT_RecordSource]"
+                      name="SAT_RecordSource" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[TaxpayerID]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[TaxpayerID]"
+                      name="TaxpayerID" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[DeclarationID]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[DeclarationID]"
+                      name="DeclarationID" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[AnnualDeclarationID]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[AnnualDeclarationID]"
+                      name="AnnualDeclarationID" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[PaymentAmount]"
+                      dataType="numeric"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[PaymentAmount]"
+                      name="PaymentAmount"
+                      precision="18"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[PaymentDate]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[PaymentDate]"
+                      name="PaymentDate" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[PaymentMethod]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[PaymentMethod]"
+                      name="PaymentMethod" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[ReferenceNumber]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[ReferenceNumber]"
+                      name="ReferenceNumber" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[Status]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[Status]"
+                      name="Status" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[IsActive]"
+                      dataType="bool"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[IsActive]"
+                      name="IsActive" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\DFT_Load_Sat\ROW_CNT"
+              componentClassID="Microsoft.RowCount"
+              contactInfo="Row Count;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Counts rows as they pass through a data flow. For example, use the number of rows processed to determine whether or not to perform cleanup operations, or update text in an e-mail message to communicate processing status."
+              name="ROW_CNT">
+              <properties>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable to hold the row count."
+                  name="VariableName">User::v_RowCount</property>
+              </properties>
+              <inputs>
+                <input
+                  refId="Package\DFT_Load_Sat\ROW_CNT.Inputs[Row Count Input 1]"
+                  hasSideEffects="true"
+                  name="Row Count Input 1">
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\DFT_Load_Sat\ROW_CNT.Outputs[Row Count Output 1]"
+                  name="Row Count Output 1"
+                  synchronousInputId="Package\DFT_Load_Sat\ROW_CNT.Inputs[Row Count Input 1]">
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\DFT_Load_Sat\Union New Change"
+              componentClassID="Microsoft.UnionAll"
+              contactInfo="Union All;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;1"
+              description="Combines rows from multiple data flows without sorting. For example, add rows back to a data flow after correction of errors. If sorting is important, we recommend using the Merge transformation."
+              name="Union New Change"
+              version="1">
+              <inputs>
+                <input
+                  refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1]"
+                  name="Union All Input 1">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[HUB_Payment_HK]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="HUB_Payment_HK"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[HUB_Payment_HK]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[HUB_Payment_HK]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[SAT_LoadDate]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="SAT_LoadDate"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_LoadDate]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_LoadDate]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[SAT_HashDiff]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="SAT_HashDiff"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_HashDiff]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_HashDiff]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[SAT_RecordSource]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="SAT_RecordSource"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_RecordSource]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_RecordSource]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[TaxpayerID]"
+                      cachedDataType="i4"
+                      cachedName="TaxpayerID"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[TaxpayerID]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[TaxpayerID]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[DeclarationID]"
+                      cachedDataType="i4"
+                      cachedName="DeclarationID"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[DeclarationID]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[DeclarationID]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[AnnualDeclarationID]"
+                      cachedDataType="i4"
+                      cachedName="AnnualDeclarationID"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[AnnualDeclarationID]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[AnnualDeclarationID]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[PaymentAmount]"
+                      cachedDataType="numeric"
+                      cachedName="PaymentAmount"
+                      cachedPrecision="18"
+                      cachedScale="2"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentAmount]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentAmount]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[PaymentDate]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="PaymentDate"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentDate]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentDate]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[PaymentMethod]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="PaymentMethod"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentMethod]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentMethod]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[ReferenceNumber]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="100"
+                      cachedName="ReferenceNumber"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[ReferenceNumber]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[ReferenceNumber]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[Status]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="Status"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[Status]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[Status]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1].Columns[IsActive]"
+                      cachedDataType="bool"
+                      cachedName="IsActive"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[IsActive]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[IsActive]}</property>
+                      </properties>
+                    </inputColumn>
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+                <input
+                  refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3]"
+                  hasSideEffects="true"
+                  name="Union All Input 3">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[HUB_Payment_HK]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="HUB_Payment_HK"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[HUB_Payment_HK]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[HUB_Payment_HK]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[SAT_LoadDate]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="SAT_LoadDate"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_LoadDate]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_LoadDate]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[SAT_HashDiff]"
+                      cachedDataType="bytes"
+                      cachedLength="8000"
+                      cachedName="SAT_HashDiff"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_HashDiff]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_HashDiff]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[SAT_RecordSource]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="SAT_RecordSource"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[SAT_RecordSource]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_RecordSource]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[TaxpayerID]"
+                      cachedDataType="i4"
+                      cachedName="TaxpayerID"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[TaxpayerID]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[TaxpayerID]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[DeclarationID]"
+                      cachedDataType="i4"
+                      cachedName="DeclarationID"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[DeclarationID]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[DeclarationID]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[AnnualDeclarationID]"
+                      cachedDataType="i4"
+                      cachedName="AnnualDeclarationID"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[AnnualDeclarationID]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[AnnualDeclarationID]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[PaymentAmount]"
+                      cachedDataType="numeric"
+                      cachedName="PaymentAmount"
+                      cachedPrecision="18"
+                      cachedScale="2"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentAmount]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentAmount]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[PaymentDate]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="PaymentDate"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentDate]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentDate]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[PaymentMethod]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="PaymentMethod"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[PaymentMethod]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentMethod]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[ReferenceNumber]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="100"
+                      cachedName="ReferenceNumber"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[ReferenceNumber]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[ReferenceNumber]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[Status]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="Status"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[Status]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[Status]}</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3].Columns[IsActive]"
+                      cachedDataType="bool"
+                      cachedName="IsActive"
+                      lineageId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output].Columns[IsActive]">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Output column lineage ID"
+                          name="OutputColumnLineageID">#{Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[IsActive]}</property>
+                      </properties>
+                    </inputColumn>
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+                <input
+                  refId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 2]"
+                  dangling="true"
+                  hasSideEffects="true"
+                  name="Union All Input 2">
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1]"
+                  name="Union All Output 1">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[HUB_Payment_HK]"
+                      dataType="bytes"
+                      length="8000"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[HUB_Payment_HK]"
+                      name="HUB_Payment_HK" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_LoadDate]"
+                      dataType="dbTimeStamp"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_LoadDate]"
+                      name="SAT_LoadDate" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_HashDiff]"
+                      dataType="bytes"
+                      length="8000"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_HashDiff]"
+                      name="SAT_HashDiff" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_RecordSource]"
+                      dataType="wstr"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[SAT_RecordSource]"
+                      name="SAT_RecordSource" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[TaxpayerID]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[TaxpayerID]"
+                      name="TaxpayerID" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[DeclarationID]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[DeclarationID]"
+                      name="DeclarationID" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[AnnualDeclarationID]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[AnnualDeclarationID]"
+                      name="AnnualDeclarationID" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentAmount]"
+                      dataType="numeric"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentAmount]"
+                      name="PaymentAmount"
+                      precision="18"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentDate]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentDate]"
+                      name="PaymentDate" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentMethod]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[PaymentMethod]"
+                      name="PaymentMethod" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[ReferenceNumber]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[ReferenceNumber]"
+                      name="ReferenceNumber" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[Status]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[Status]"
+                      name="Status" />
+                    <outputColumn
+                      refId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[IsActive]"
+                      dataType="bool"
+                      lineageId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1].Columns[IsActive]"
+                      name="IsActive" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\DFT_Load_Sat.Paths[Changed]"
+              endId="Package\DFT_Load_Sat\MULTI_Changed.Inputs[Multicast Input 1]"
+              name="Changed"
+              startId="Package\DFT_Load_Sat\CSPL_DetectChanges.Outputs[Changed]" />
+            <path
+              refId="Package\DFT_Load_Sat.Paths[Lookup Match Output]"
+              endId="Package\DFT_Load_Sat\CSPL_DetectChanges.Inputs[Conditional Split Input]"
+              name="Lookup Match Output"
+              startId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup Match Output]" />
+            <path
+              refId="Package\DFT_Load_Sat.Paths[Lookup No Match Output]"
+              endId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 1]"
+              name="Lookup No Match Output"
+              startId="Package\DFT_Load_Sat\LKP_SAT.Outputs[Lookup No Match Output]" />
+            <path
+              refId="Package\DFT_Load_Sat.Paths[Multicast Output 1]"
+              endId="Package\DFT_Load_Sat\Union New Change.Inputs[Union All Input 3]"
+              name="Multicast Output 1"
+              startId="Package\DFT_Load_Sat\MULTI_Changed.Outputs[Multicast Output 1]" />
+            <path
+              refId="Package\DFT_Load_Sat.Paths[Multicast Output 2]"
+              endId="Package\DFT_Load_Sat\CMD_EndDate.Inputs[OLE DB Command Input]"
+              name="Multicast Output 2"
+              startId="Package\DFT_Load_Sat\MULTI_Changed.Outputs[Multicast Output 2]" />
+            <path
+              refId="Package\DFT_Load_Sat.Paths[OLE DB Source Output]"
+              endId="Package\DFT_Load_Sat\LKP_SAT.Inputs[Lookup Input]"
+              name="OLE DB Source Output"
+              startId="Package\DFT_Load_Sat\OLE_SRC.Outputs[OLE DB Source Output]" />
+            <path
+              refId="Package\DFT_Load_Sat.Paths[Row Count Output 1]"
+              endId="Package\DFT_Load_Sat\OLE_DST.Inputs[OLE DB Destination Input]"
+              name="Row Count Output 1"
+              startId="Package\DFT_Load_Sat\ROW_CNT.Outputs[Row Count Output 1]" />
+            <path
+              refId="Package\DFT_Load_Sat.Paths[Union All Output 1]"
+              endId="Package\DFT_Load_Sat\ROW_CNT.Inputs[Row Count Input 1]"
+              name="Union All Output 1"
+              startId="Package\DFT_Load_Sat\Union New Change.Outputs[Union All Output 1]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\SQL_EndStep"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{4F981E76-6218-4BF5-8138-69737B24F688}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="SQL_EndStep"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2025; © 2025 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{B7A338C3-8C44-4E6C-BD78-3DEE9D4318C1}"
+          SQLTask:SqlStatementSource="EXEC dbo.usp_EndStep&#xA;    @StepID   = ?,&#xA;    @Status   = 'Success',&#xA;    @RowCount = ?;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="0"
+            SQLTask:DtsVariableName="User::v_StepID"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="3"
+            SQLTask:ParameterSize="-1" />
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="1"
+            SQLTask:DtsVariableName="User::v_RowCount"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="3"
+            SQLTask:ParameterSize="-1" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\SQL_StartStep"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{6AA0D122-69BF-4167-9F62-9B00E8E3E011}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="SQL_StartStep"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2025; © 2025 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:EventHandlers>
+        <DTS:EventHandler
+          DTS:refId="Package\SQL_StartStep.EventHandlers[OnError]"
+          DTS:CreationName="OnError"
+          DTS:DTSID="{4E6B80E9-DAB9-4A55-95CE-068A77B1CB84}"
+          DTS:EventID="-1842044272"
+          DTS:EventName="OnError"
+          DTS:LocaleID="-1">
+          <DTS:Variables>
+            <DTS:Variable
+              DTS:CreationName=""
+              DTS:Description="The propagate property of the event"
+              DTS:DTSID="{48A1A460-B705-4D25-955A-A45FDA6BF80E}"
+              DTS:IncludeInDebugDump="6789"
+              DTS:Namespace="System"
+              DTS:ObjectName="Propagate">
+              <DTS:VariableValue
+                DTS:DataType="11">-1</DTS:VariableValue>
+            </DTS:Variable>
+          </DTS:Variables>
+          <DTS:Executables />
+        </DTS:EventHandler>
+      </DTS:EventHandlers>
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{B7A338C3-8C44-4E6C-BD78-3DEE9D4318C1}"
+          SQLTask:SqlStatementSource="EXEC dbo.usp_StartStep&#xA;    @BatchID  = ?,&#xA;    @StepName = ?,&#xA;    @StepID   = ? OUTPUT;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="0"
+            SQLTask:DtsVariableName="$Package::p_BatchID"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="3"
+            SQLTask:ParameterSize="-1" />
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="1"
+            SQLTask:DtsVariableName="User::v_StepName"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="130"
+            SQLTask:ParameterSize="-1" />
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="2"
+            SQLTask:DtsVariableName="User::v_StepID"
+            SQLTask:ParameterDirection="Output"
+            SQLTask:DataType="3"
+            SQLTask:ParameterSize="-1" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{A12729FE-4599-46D0-BECE-ACF6E905F44B}"
+      DTS:From="Package\SQL_StartStep"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\DFT_Load_Sat" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
+      DTS:CreationName=""
+      DTS:DTSID="{4C052133-6B2F-48CE-BB80-CAE7C6B22367}"
+      DTS:From="Package\DFT_Load_Sat"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 1"
+      DTS:To="Package\SQL_EndStep" />
+  </DTS:PrecedenceConstraints>
+  <DTS:EventHandlers>
+    <DTS:EventHandler
+      DTS:refId="Package.EventHandlers[OnError]"
+      DTS:CreationName="OnError"
+      DTS:DTSID="{770A753F-40C3-49E5-B159-E8EB213C288E}"
+      DTS:EventID="0"
+      DTS:EventName="OnError"
+      DTS:LocaleID="-1"
+      DTS:TransactionOption="0">
+      <DTS:Variables>
+        <DTS:Variable
+          DTS:CreationName=""
+          DTS:Description="The propagate property of the event"
+          DTS:DTSID="{72C90406-FB8F-49E0-B252-5E178F538F62}"
+          DTS:IncludeInDebugDump="6789"
+          DTS:Namespace="System"
+          DTS:ObjectName="Propagate">
+          <DTS:VariableValue
+            DTS:DataType="11">-1</DTS:VariableValue>
+        </DTS:Variable>
+      </DTS:Variables>
+      <DTS:Executables>
+        <DTS:Executable
+          DTS:refId="Package.EventHandlers[OnError]\SCR_CaptureError"
+          DTS:CreationName="Microsoft.ScriptTask"
+          DTS:Description="Script Task"
+          DTS:DTSID="{075417A4-6383-4382-8C59-9BE67AC7AEFB}"
+          DTS:ExecutableType="Microsoft.ScriptTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="SCR_CaptureError">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ScriptProject
+              Name="ST_d48889b78bf1451c883aef2f9ae633a5"
+              VSTAMajorVersion="17"
+              VSTAMinorVersion="0"
+              Language="CSharp"
+              ReadOnlyVariables="System::ErrorDescription"
+              ReadWriteVariables="User::v_ErrorMessage">
+              <ProjectItem
+                Name="Properties\Resources.resx"
+                Encoding="UTF8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+</root>]]></ProjectItem>
+              <ProjectItem
+                Name="Properties\Settings.Designer.cs"
+                Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_8dfac7fd524b4edd97111e4d5a39daf6.Properties.Settings.get_Default():ST_8dfac7fd524b4edd97111e4d5a39daf6.Properties.Sett" +
+    "ings")]
+
+namespace ST_8dfac7fd524b4edd97111e4d5a39daf6.Properties {
+    
+    
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
+        [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        private static Settings defaultInstance = new Settings();
+        
+        public static Settings Default {
+            get {
+                return defaultInstance;
+            }
+        }
+    }
+}]]></ProjectItem>
+              <ProjectItem
+                Name="ScriptMain.cs"
+                Encoding="UTF8"><![CDATA[#region Help:  Introduction to the script task
+/* The Script Task allows you to perform virtually any operation that can be accomplished in
+ * a .Net application within the context of an Integration Services control flow. 
+ * 
+ * Expand the other regions which have "Help" prefixes for examples of specific ways to use
+ * Integration Services features within this script task. */
+#endregion
+
+
+#region Namespaces
+using System;
+using System.Data;
+using Microsoft.SqlServer.Dts.Runtime;
+using System.Windows.Forms;
+#endregion
+
+namespace ST_8dfac7fd524b4edd97111e4d5a39daf6
+{
+    /// <summary>
+    /// ScriptMain is the entry point class of the script.  Do not change the name, attributes,
+    /// or parent of this class.
+    /// </summary>
+	[Microsoft.SqlServer.Dts.Tasks.ScriptTask.SSISScriptTaskEntryPointAttribute]
+	public partial class ScriptMain : Microsoft.SqlServer.Dts.Tasks.ScriptTask.VSTARTScriptObjectModelBase
+	{
+        #region Help:  Using Integration Services variables and parameters in a script
+        /* To use a variable in this script, first ensure that the variable has been added to 
+         * either the list contained in the ReadOnlyVariables property or the list contained in 
+         * the ReadWriteVariables property of this script task, according to whether or not your
+         * code needs to write to the variable.  To add the variable, save this script, close this instance of
+         * Visual Studio, and update the ReadOnlyVariables and 
+         * ReadWriteVariables properties in the Script Transformation Editor window.
+         * To use a parameter in this script, follow the same steps. Parameters are always read-only.
+         * 
+         * Example of reading from a variable:
+         *  DateTime startTime = (DateTime) Dts.Variables["System::StartTime"].Value;
+         * 
+         * Example of writing to a variable:
+         *  Dts.Variables["User::myStringVariable"].Value = "new value";
+         * 
+         * Example of reading from a package parameter:
+         *  int batchId = (int) Dts.Variables["$Package::batchId"].Value;
+         *  
+         * Example of reading from a project parameter:
+         *  int batchId = (int) Dts.Variables["$Project::batchId"].Value;
+         * 
+         * Example of reading from a sensitive project parameter:
+         *  int batchId = (int) Dts.Variables["$Project::batchId"].GetSensitiveValue();
+         * */
+
+        #endregion
+
+        #region Help:  Firing Integration Services events from a script
+        /* This script task can fire events for logging purposes.
+         * 
+         * Example of firing an error event:
+         *  Dts.Events.FireError(18, "Process Values", "Bad value", "", 0);
+         * 
+         * Example of firing an information event:
+         *  Dts.Events.FireInformation(3, "Process Values", "Processing has started", "", 0, ref fireAgain)
+         * 
+         * Example of firing a warning event:
+         *  Dts.Events.FireWarning(14, "Process Values", "No values received for input", "", 0);
+         * */
+        #endregion
+
+        #region Help:  Using Integration Services connection managers in a script
+        /* Some types of connection managers can be used in this script task.  See the topic 
+         * "Working with Connection Managers Programatically" for details.
+         * 
+         * Example of using an ADO.Net connection manager:
+         *  object rawConnection = Dts.Connections["Sales DB"].AcquireConnection(Dts.Transaction);
+         *  SqlConnection myADONETConnection = (SqlConnection)rawConnection;
+         *  //Use the connection in some code here, then release the connection
+         *  Dts.Connections["Sales DB"].ReleaseConnection(rawConnection);
+         *
+         * Example of using a File connection manager
+         *  object rawConnection = Dts.Connections["Prices.zip"].AcquireConnection(Dts.Transaction);
+         *  string filePath = (string)rawConnection;
+         *  //Use the connection in some code here, then release the connection
+         *  Dts.Connections["Prices.zip"].ReleaseConnection(rawConnection);
+         * */
+        #endregion
+
+
+		/// <summary>
+        /// This method is called when this script task executes in the control flow.
+        /// Before returning from this method, set the value of Dts.TaskResult to indicate success or failure.
+        /// To open Help, press F1.
+        /// </summary>
+		public void Main()
+		{
+            // TODO: Add your code here
+            string errMsg = Dts.Variables["System::ErrorDescription"].Value.ToString();
+            Dts.Variables["User::v_ErrorMessage"].Value = errMsg;
+
+            Dts.TaskResult = (int)ScriptResults.Success;
+		}
+
+        #region ScriptResults declaration
+        /// <summary>
+        /// This enum provides a convenient shorthand within the scope of this class for setting the
+        /// result of the script.
+        /// 
+        /// This code was generated automatically.
+        /// </summary>
+        enum ScriptResults
+        {
+            Success = Microsoft.SqlServer.Dts.Runtime.DTSExecResult.Success,
+            Failure = Microsoft.SqlServer.Dts.Runtime.DTSExecResult.Failure
+        };
+        #endregion
+
+	}
+}]]></ProjectItem>
+              <ProjectItem
+                Name="ST_d48889b78bf1451c883aef2f9ae633a5.csproj"
+                Encoding="UTF8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectTypeGuids>{30D016F9-3734-4E33-A861-5E7D899E18F3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{29C0C7AE-3B2A-4F11-8197-7AEEDB099377}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ST_8dfac7fd524b4edd97111e4d5a39daf6</RootNamespace>
+    <AssemblyName>ST_d48889b78bf1451c883aef2f9ae633a5</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ResolveAssemblyReferenceIgnoreTargetFrameworkAttributeVersionMismatch>true</ResolveAssemblyReferenceIgnoreTargetFrameworkAttributeVersionMismatch>
+    <TargetFrameworkProfile></TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.\bin\Debug\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>.\bin\Release\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.SqlServer.ManagedDTS, Version=17.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
+    <Reference Include="Microsoft.SqlServer.ScriptTask, Version=17.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppDesigner Include="Properties\" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="ScriptMain.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <!-- Include the build rules for a C# project.-->
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{30D016F9-3734-4E33-A861-5E7D899E18F3}">
+        <ProjectProperties HostName="VSTAHostName" HostPackage="{B3A685AA-7EAF-4BC6-9940-57959FA5AC07}" ApplicationType="usd" Language="cs" TemplatesPath="" />
+        <Host Name="ScriptTask" />
+        <ProjectClient>
+          <HostIdentifier>SSIS_ST170</HostIdentifier>
+        </ProjectClient>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>]]></ProjectItem>
+              <ProjectItem
+                Name="Project"
+                Encoding="UTF16LE"><![CDATA[<?xml version="1.0" encoding="UTF-16" standalone="yes"?>
+<c:Project xmlns:c="http://schemas.microsoft.com/codeprojectml/2010/08/main" xmlns:msb="http://schemas.microsoft.com/developer/msbuild/2003" runtimeVersion="4.0" schemaVersion="1.0">
+  <msb:PropertyGroup>
+    <msb:CodeName>ST_d48889b78bf1451c883aef2f9ae633a5</msb:CodeName>
+    <msb:Language>msBuild</msb:Language>
+    <msb:DisplayName>ST_d48889b78bf1451c883aef2f9ae633a5</msb:DisplayName>
+    <msb:ProjectId>{D6E01A19-587B-4825-9B13-8C41B12F0A01}</msb:ProjectId>
+  </msb:PropertyGroup>
+  <msb:ItemGroup>
+    <msb:Project Include="ST_d48889b78bf1451c883aef2f9ae633a5.csproj" />
+    <msb:File Include="Properties\Resources.resx" />
+    <msb:File Include="Properties\Settings.settings" />
+    <msb:File Include="Properties\AssemblyInfo.cs" />
+    <msb:File Include="Properties\Resources.Designer.cs" />
+    <msb:File Include="Properties\Settings.Designer.cs" />
+    <msb:File Include="ScriptMain.cs" />
+  </msb:ItemGroup>
+</c:Project>]]></ProjectItem>
+              <ProjectItem
+                Name="Properties\AssemblyInfo.cs"
+                Encoding="UTF8"><![CDATA[using System.Reflection;
+using System.Runtime.CompilerServices;
+
+//
+// General Information about an assembly is controlled through the following 
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+//
+[assembly: AssemblyTitle("ST_8dfac7fd524b4edd97111e4d5a39daf6")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("ST_8dfac7fd524b4edd97111e4d5a39daf6")]
+[assembly: AssemblyCopyright("Copyright @  2026")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+//
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version 
+//      Build Number
+//      Revision
+//
+// You can specify all the values or you can default the Revision and Build Numbers 
+// by using the '*' as shown below:
+
+[assembly: AssemblyVersion("1.0.*")]]]></ProjectItem>
+              <ProjectItem
+                Name="Properties\Settings.settings"
+                Encoding="UTF8"><![CDATA[<?xml version='1.0' encoding='iso-8859-1'?>
+<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
+  <Profiles>
+    <Profile Name="(Default)" />
+  </Profiles>
+  <Settings />
+</SettingsFile>]]></ProjectItem>
+              <ProjectItem
+                Name="Properties\Resources.Designer.cs"
+                Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_8dfac7fd524b4edd97111e4d5a39daf6.Properties.Resources.get_ResourceManager():System.Resources.Resou" +
+    "rceManager")]
+[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_8dfac7fd524b4edd97111e4d5a39daf6.Properties.Resources.get_Culture():System.Globalization.CultureIn" +
+    "fo")]
+[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_8dfac7fd524b4edd97111e4d5a39daf6.Properties.Resources.set_Culture(System.Globalization.CultureInfo" +
+    "):Void")]
+
+namespace ST_8dfac7fd524b4edd97111e4d5a39daf6.Properties {
+    
+    
+    /// <summary>
+    ///   A strongly-typed resource class, for looking up localized strings, etc.
+    /// </summary>
+    // This class was auto-generated by the StronglyTypedResourceBuilder
+    // class via a tool like ResGen or Visual Studio.
+    // To add or remove a member, edit your .ResX file then rerun ResGen
+    // with the /str option, or rebuild your VS project.
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    internal class Resources {
+        
+        private static global::System.Resources.ResourceManager resourceMan;
+        
+        private static global::System.Globalization.CultureInfo resourceCulture;
+        
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        internal Resources() {
+        }
+        
+        /// <summary>
+        ///   Returns the cached ResourceManager instance used by this class.
+        /// </summary>
+        [global::System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if ((resourceMan == null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ST_8dfac7fd524b4edd97111e4d5a39daf6.Properties.Resources", typeof(Resources).Assembly);
+                    resourceMan = temp;
+                }
+                return resourceMan;
+            }
+        }
+        
+        /// <summary>
+        ///   Overrides the current thread's CurrentUICulture property for all
+        ///   resource lookups using this strongly typed resource class.
+        /// </summary>
+        [global::System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
+                return resourceCulture;
+            }
+            set {
+                resourceCulture = value;
+            }
+        }
+    }
+}]]></ProjectItem>
+              <BinaryItem
+                Name="ST_d48889b78bf1451c883aef2f9ae633a5.dll">TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAgAAAAA4fug4AtAnNIbgBTM0hVGhpcyBwcm9ncmFtIGNhbm5vdCBiZSBydW4gaW4gRE9TIG1v
+ZGUuDQ0KJAAAAAAAAABQRQAATAEDAHEflWkAAAAAAAAAAOAAIiALATAAABAAAAAIAAAAAAAAGi4A
+AAAgAAAAQAAAAAAAEAAgAAAAAgAABAAAAAAAAAAGAAAAAAAAAACAAAAAAgAAAAAAAAMAYIUAABAA
+ABAAAAAAEAAAEAAAAAAAABAAAAAAAAAAAAAAAMgtAABPAAAAAEAAAHgEAAAAAAAAAAAAAAAAAAAA
+AAAAAGAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAIAAACAAAAAAAAAAAAAAACCAAAEgAAAAAAAAAAAAAAC50ZXh0AAAAIA4AAAAgAAAAEAAAAAIA
+AAAAAAAAAAAAAAAAACAAAGAucnNyYwAAAHgEAAAAQAAAAAYAAAASAAAAAAAAAAAAAAAAAABAAABA
+LnJlbG9jAAAMAAAAAGAAAAACAAAAGAAAAAAAAAAAAAAAAAAAQAAAQgAAAAAAAAAAAAAAAAAAAAD8
+LQAAAAAAAEgAAAACAAUADCEAAAQMAAABAAAAAAAAABAtAAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAABMwAgBIAAAAAQAAEQIoEAAACm8RAAAKcgEAAHBvEgAACm8T
+AAAKbxQAAAoKAigQAAAKbxEAAApyMwAAcG8SAAAKBm8VAAAKAigQAAAKFm8WAAAKKh4CKBcAAAoq
+HgIoGAAACiqufgEAAAQtHnJdAABw0AMAAAIoGQAACm8aAAAKcxsAAAqAAQAABH4BAAAEKhp+AgAA
+BCoeAoACAAAEKhp+AwAABCoeAigcAAAKKi5zCAAABoADAAAEKgAAQlNKQgEAAQAAAAAADAAAAHY0
+LjAuMzAzMTkAAAAABQBsAAAAxAMAACN+AAAwBAAAjAUAACNTdHJpbmdzAAAAALwJAADQAAAAI1VT
+AIwKAAAQAAAAI0dVSUQAAACcCgAAaAEAACNCbG9iAAAAAAAAAAIAAAFXHaIBCQMAAAD6ATMAFgAA
+AQAAAB0AAAAFAAAABgAAAAkAAAABAAAAHAAAAAIAAAAQAAAAAQAAAAIAAAADAAAABAAAAAEAAAAE
+AAAAAQAAAAEAAAAAAKMDAQAAAAAABgBJAnMEBgDYAnMEBgCVAWAEDwDnBAAABgDCASEEBgAsAiEE
+BgANAiEEBgC/AiEEBgBpAiEEBgCCAiEEBgDZASEEBgD0ARADCgCdAlIDCgAUAVIDBgDbA9QDBgB4
+AWAEBgBaBdQDBgBDBJMEBgAzBAwEDgBIAY0DDgCpAY0DDgAwAfcDBgBdAXMECgB7A1IDEgApBb8A
+EgCSAL8ABgDfANQDBgCbANQDBgCABSEEAAAAAEkAAAAAAAEAAQABABAA7AMlADkAAQABAAAAEACa
+BPYERQABAAMAAAEQADMF9gRZAAMABwADAQAATAUAAD0ABAAKABEA4ANrABEABAFvABEAggBzAAYG
+cQB3AFaAPAV6AFaA5AB6AFAgAAAAAIYA8gMGAAEApCAAAAAAhhhTBAYAAQCsIAAAAACDGFMEBgAB
+ALQgAAAAAJMIPwR+AAEA4CAAAAAAkwjsAIMAAQDnIAAAAACTCPgAiAABAO8gAAAAAJYIYQWOAAIA
+9iAAAAAAhhhTBAYAAgD+IAAAAACRGFkEkwACAAAAAQAKAwkAUwQBABEAUwQGABkAUwQKACkAUwQQ
+ADEAUwQQADkAUwQQAEEAUwQQAEkAUwQQAFEAUwQQAFkAUwQQAGEAUwQQAGkAUwQGAIEAUwQGAKkA
+UwQVALkAUwQGAHEARAUfAMEAJQUkAMkAywMpANEA9gIvAIkAKgMzANEAAAM3AMEAbQUBAHEAUwQG
+AIkAUwQGANkArQA8ANkAfAVDAJEAUwRIALEAUwQGAAgAFABhAAgAGABmACkAcwDOAC4ACwCmAC4A
+EwCvAC4AGwDOAC4AIwDXAC4AKwAAAS4AMwAAAS4AOwAAAS4AQwDXAC4ASwAGAS4AUwAAAS4AWwAd
+AUMAYwBmAEkAcwDOAGEAewBmAGMAawBmABsAAwABAAQAAwAAAEMElwAAAAwBnAAAAGUFoQACAAQA
+AwACAAUABQABAAYABQACAAcABwAEgAAAAQAAAEklcEAAAAAAAAABAAAABAAAAAAAAAAAAAAATwB5
+AAAAAAARAAAAAAAAAAAAAABYADMDAAAAAAQAAAAAAAAAAAAAAE8A1AMAAAAAEQAAAAAAAAAAAAAA
+WABSAAAAAAAAAAAAAQAAAKQEAAAFAAIAAAAAAABTVF9kNDg4ODliNzhiZjE0NTFjODgzYWVmMmY5
+YWU2MzNhNQBTVF84ZGZhYzdmZDUyNGI0ZWRkOTcxMTFlNGQ1YTM5ZGFmNgA8TW9kdWxlPgBNaWNy
+b3NvZnQuU3FsU2VydmVyLk1hbmFnZWREVFMAdmFsdWVfXwBtc2NvcmxpYgBkZWZhdWx0SW5zdGFu
+Y2UAVmFyaWFibGUAUnVudGltZVR5cGVIYW5kbGUAR2V0VHlwZUZyb21IYW5kbGUATWljcm9zb2Z0
+LlNxbFNlcnZlci5EdHMuUnVudGltZQBUeXBlAEZhaWx1cmUAZ2V0X0N1bHR1cmUAc2V0X0N1bHR1
+cmUAcmVzb3VyY2VDdWx0dXJlAFZTVEFSVFNjcmlwdE9iamVjdE1vZGVsQmFzZQBBcHBsaWNhdGlv
+blNldHRpbmdzQmFzZQBFZGl0b3JCcm93c2FibGVTdGF0ZQBDb21waWxlckdlbmVyYXRlZEF0dHJp
+YnV0ZQBEZWJ1Z2dlck5vblVzZXJDb2RlQXR0cmlidXRlAERlYnVnZ2FibGVBdHRyaWJ1dGUARWRp
+dG9yQnJvd3NhYmxlQXR0cmlidXRlAEFzc2VtYmx5VGl0bGVBdHRyaWJ1dGUAQXNzZW1ibHlUcmFk
+ZW1hcmtBdHRyaWJ1dGUAVGFyZ2V0RnJhbWV3b3JrQXR0cmlidXRlAEFzc2VtYmx5Q29uZmlndXJh
+dGlvbkF0dHJpYnV0ZQBBc3NlbWJseURlc2NyaXB0aW9uQXR0cmlidXRlAENvbXBpbGF0aW9uUmVs
+YXhhdGlvbnNBdHRyaWJ1dGUAQXNzZW1ibHlQcm9kdWN0QXR0cmlidXRlAEFzc2VtYmx5Q29weXJp
+Z2h0QXR0cmlidXRlAFNTSVNTY3JpcHRUYXNrRW50cnlQb2ludEF0dHJpYnV0ZQBBc3NlbWJseUNv
+bXBhbnlBdHRyaWJ1dGUAUnVudGltZUNvbXBhdGliaWxpdHlBdHRyaWJ1dGUAZ2V0X1ZhbHVlAHNl
+dF9WYWx1ZQB2YWx1ZQBTeXN0ZW0uUnVudGltZS5WZXJzaW9uaW5nAFRvU3RyaW5nAE1pY3Jvc29m
+dC5TcWxTZXJ2ZXIuU2NyaXB0VGFzawBNaWNyb3NvZnQuU3FsU2VydmVyLkR0cy5UYXNrcy5TY3Jp
+cHRUYXNrAFNjcmlwdE9iamVjdE1vZGVsAFN5c3RlbS5Db21wb25lbnRNb2RlbABTVF9kNDg4ODli
+NzhiZjE0NTFjODgzYWVmMmY5YWU2MzNhNS5kbGwAZ2V0X0l0ZW0AU3lzdGVtAEVudW0AcmVzb3Vy
+Y2VNYW4AU2NyaXB0TWFpbgBTeXN0ZW0uQ29uZmlndXJhdGlvbgBTeXN0ZW0uR2xvYmFsaXphdGlv
+bgBTeXN0ZW0uUmVmbGVjdGlvbgBDdWx0dXJlSW5mbwBnZXRfUmVzb3VyY2VNYW5hZ2VyAC5jdG9y
+AC5jY3RvcgBTeXN0ZW0uRGlhZ25vc3RpY3MAU3lzdGVtLlJ1bnRpbWUuQ29tcGlsZXJTZXJ2aWNl
+cwBTeXN0ZW0uUmVzb3VyY2VzAFNUXzhkZmFjN2ZkNTI0YjRlZGQ5NzExMWU0ZDVhMzlkYWY2LlBy
+b3BlcnRpZXMuUmVzb3VyY2VzLnJlc291cmNlcwBEZWJ1Z2dpbmdNb2RlcwBTVF84ZGZhYzdmZDUy
+NGI0ZWRkOTcxMTFlNGQ1YTM5ZGFmNi5Qcm9wZXJ0aWVzAGdldF9WYXJpYWJsZXMAU2V0dGluZ3MA
+U3VjY2VzcwBnZXRfRHRzAFNjcmlwdFJlc3VsdHMAT2JqZWN0AGdldF9EZWZhdWx0AHNldF9UYXNr
+UmVzdWx0AGdldF9Bc3NlbWJseQAAAAAAMVMAeQBzAHQAZQBtADoAOgBFAHIAcgBvAHIARABlAHMA
+YwByAGkAcAB0AGkAbwBuAAApVQBzAGUAcgA6ADoAdgBfAEUAcgByAG8AcgBNAGUAcwBzAGEAZwBl
+AABxUwBUAF8AOABkAGYAYQBjADcAZgBkADUAMgA0AGIANABlAGQAZAA5ADcAMQAxADEAZQA0AGQA
+NQBhADMAOQBkAGEAZgA2AC4AUAByAG8AcABlAHIAdABpAGUAcwAuAFIAZQBzAG8AdQByAGMAZQBz
+AAAAxUkyt3gv+0GEkrX0aBwFfgAEIAEBCAMgAAEFIAEBEREEIAEBDgUgAQERUQMHAQ4EIAASYQQg
+ABJlBSABEmkcAyAAHAMgAA4EIAEBHAYAARJtEXEEIAASdQYgAgEOEnUIt3pcVhk04IkIiYRdzYCA
+zJEEAAAAAAQBAAAAAwYSSQMGEk0DBhIQAgYIAwYRFAQAABJJBAAAEk0FAAEBEk0EAAASEAMAAAEE
+CAASSQQIABJNBAgAEhAIAQAIAAAAAAAeAQABAFQCFldyYXBOb25FeGNlcHRpb25UaHJvd3MBCAEA
+AgAAAAAAKAEAI1NUXzhkZmFjN2ZkNTI0YjRlZGQ5NzExMWU0ZDVhMzlkYWY2AAAFAQAAAAAWAQAR
+Q29weXJpZ2h0IEAgIDIwMjYAAEkBABouTkVURnJhbWV3b3JrLFZlcnNpb249djQuNwEAVA4URnJh
+bWV3b3JrRGlzcGxheU5hbWUSLk5FVCBGcmFtZXdvcmsgNC43ALQAAADOyu++AQAAAJEAAABsU3lz
+dGVtLlJlc291cmNlcy5SZXNvdXJjZVJlYWRlciwgbXNjb3JsaWIsIFZlcnNpb249NC4wLjAuMCwg
+Q3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5I1N5c3RlbS5S
+ZXNvdXJjZXMuUnVudGltZVJlc291cmNlU2V0AgAAAAAAAAAAAAAAUEFEUEFEULQAAADwLQAAAAAA
+AAAAAAAKLgAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/C0AAAAAAAAAAAAAAABfQ29yRGxsTWFp
+bgBtc2NvcmVlLmRsbAAAAAAA/yUAIAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAABABAAAAAYAACAAAAAAAAAAAAAAAAAAAABAAEAAAAwAACAAAAAAAAAAAAAAAAAAAABAAAA
+AABIAAAAWEAAABoEAAAAAAAAAAAAABoENAAAAFYAUwBfAFYARQBSAFMASQBPAE4AXwBJAE4ARgBP
+AAAAAAC9BO/+AAABAAAAAQBwQEklAAABAHBASSU/AAAAAAAAAAQAAAACAAAAAAAAAAAAAAAAAAAA
+RAAAAAEAVgBhAHIARgBpAGwAZQBJAG4AZgBvAAAAAAAkAAQAAABUAHIAYQBuAHMAbABhAHQAaQBv
+AG4AAAAAAAAAsAR6AwAAAQBTAHQAcgBpAG4AZwBGAGkAbABlAEkAbgBmAG8AAABWAwAAAQAwADAA
+MAAwADAANABiADAAAAAaAAEAAQBDAG8AbQBtAGUAbgB0AHMAAAAAAAAAIgABAAEAQwBvAG0AcABh
+AG4AeQBOAGEAbQBlAAAAAAAAAAAAcAAkAAEARgBpAGwAZQBEAGUAcwBjAHIAaQBwAHQAaQBvAG4A
+AAAAAFMAVABfADgAZABmAGEAYwA3AGYAZAA1ADIANABiADQAZQBkAGQAOQA3ADEAMQAxAGUANABk
+ADUAYQAzADkAZABhAGYANgAAAD4ADwABAEYAaQBsAGUAVgBlAHIAcwBpAG8AbgAAAAAAMQAuADAA
+LgA5ADUANAA1AC4AMQA2ADQAOQA2AAAAAABwACgAAQBJAG4AdABlAHIAbgBhAGwATgBhAG0AZQAA
+AFMAVABfAGQANAA4ADgAOAA5AGIANwA4AGIAZgAxADQANQAxAGMAOAA4ADMAYQBlAGYAMgBmADkA
+YQBlADYAMwAzAGEANQAuAGQAbABsAAAASAASAAEATABlAGcAYQBsAEMAbwBwAHkAcgBpAGcAaAB0
+AAAAQwBvAHAAeQByAGkAZwBoAHQAIABAACAAIAAyADAAMgA2AAAAKgABAAEATABlAGcAYQBsAFQA
+cgBhAGQAZQBtAGEAcgBrAHMAAAAAAAAAAAB4ACgAAQBPAHIAaQBnAGkAbgBhAGwARgBpAGwAZQBu
+AGEAbQBlAAAAUwBUAF8AZAA0ADgAOAA4ADkAYgA3ADgAYgBmADEANAA1ADEAYwA4ADgAMwBhAGUA
+ZgAyAGYAOQBhAGUANgAzADMAYQA1AC4AZABsAGwAAABoACQAAQBQAHIAbwBkAHUAYwB0AE4AYQBt
+AGUAAAAAAFMAVABfADgAZABmAGEAYwA3AGYAZAA1ADIANABiADQAZQBkAGQAOQA3ADEAMQAxAGUA
+NABkADUAYQAzADkAZABhAGYANgAAAEIADwABAFAAcgBvAGQAdQBjAHQAVgBlAHIAcwBpAG8AbgAA
+ADEALgAwAC4AOQA1ADQANQAuADEANgA0ADkANgAAAAAARgAPAAEAQQBzAHMAZQBtAGIAbAB5ACAA
+VgBlAHIAcwBpAG8AbgAAADEALgAwAC4AOQA1ADQANQAuADEANgA0ADkANgAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAwAAAAcPgAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</BinaryItem>
+            </ScriptProject>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package.EventHandlers[OnError]\SQL_EndStepOnError"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{737918D7-D9C2-43D9-9DA2-2C8C5E43F8DB}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="SQL_EndStepOnError"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2025; © 2025 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:TransactionOption="0">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{E1FA7AC3-AFDD-43ED-9BD2-AEE31B3AAD85}"
+              SQLTask:SqlStatementSource="SET NOCOUNT ON;&#xA;&#xA;EXEC dbo.usp_EndStep&#xA;    @StepID       = ?,&#xA;    @Status       = 'Failed',&#xA;    @RowCount     = 0,&#xA;    @ErrorMessage = ?;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="0"
+                SQLTask:DtsVariableName="User::v_StepID"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="3"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::v_ErrorMessage"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="130"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package.EventHandlers[OnError]\SQL_LogErrorOnError"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{41806558-B5E7-419D-AD91-746A4A1F827B}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="SQL_LogErrorOnError"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2025; © 2025 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:TransactionOption="0">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{E1FA7AC3-AFDD-43ED-9BD2-AEE31B3AAD85}"
+              SQLTask:SqlStatementSource="SET NOCOUNT ON;&#xA;&#xA;EXEC dbo.usp_LogError&#xA;    @BatchID       = ?,&#xA;    @StepLogID     = ?,&#xA;    @ErrorSeverity = 'Error',&#xA;    @ErrorSource   = ?,&#xA;    @ErrorMessage  = ?;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="0"
+                SQLTask:DtsVariableName="$Package::p_BatchID"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="3"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::v_ErrorSource"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="130"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::v_ErrorMessage"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="130"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::v_StepID"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="3"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+      </DTS:Executables>
+      <DTS:PrecedenceConstraints>
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package.EventHandlers[OnError].PrecedenceConstraints[Constraint]"
+          DTS:CreationName=""
+          DTS:DTSID="{76022A53-E0AA-4C63-BAA5-3177C640B58F}"
+          DTS:From="Package.EventHandlers[OnError]\SCR_CaptureError"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint"
+          DTS:To="Package.EventHandlers[OnError]\SQL_EndStepOnError" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package.EventHandlers[OnError].PrecedenceConstraints[Constraint 1]"
+          DTS:CreationName=""
+          DTS:DTSID="{A34A4AE2-777B-4F23-B5A0-2B9E116B477E}"
+          DTS:From="Package.EventHandlers[OnError]\SQL_EndStepOnError"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 1"
+          DTS:To="Package.EventHandlers[OnError]\SQL_LogErrorOnError" />
+      </DTS:PrecedenceConstraints>
+    </DTS:EventHandler>
+  </DTS:EventHandlers>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="152,42.6666666666667"
+          Id="Package\DFT_Load_Sat"
+          TopLeft="341.874984716997,71.1578939555425" />
+        <NodeLayout
+          Size="148,42.6666666666667"
+          Id="Package\SQL_EndStep"
+          TopLeft="653.124970803038,74.578946549559" />
+        <NodeLayout
+          Size="152,42.6666666666667"
+          Id="Package\SQL_StartStep"
+          TopLeft="30.6249986309559,71.1578939555425" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="182.624998630956,92.4912272888758">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="159.249986086041,0"
+              Start="0,0"
+              End="151.749986086041,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="151.749986086041,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 1]"
+          TopLeft="493.874984716997,94.2017535858841">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="159.249986086041,0"
+              Start="0,0"
+              End="151.749986086041,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="151.749986086041,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <DtsEventHandler
+    design-time-name="Package.EventHandlers[OnError]">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="169.333333333334,42.6666666666667"
+          Id="Package.EventHandlers[OnError]\SCR_CaptureError"
+          TopLeft="60,60" />
+        <NodeLayout
+          Size="185.333333333334,42.6666666666667"
+          Id="Package.EventHandlers[OnError]\SQL_EndStepOnError"
+          TopLeft="283.874994715675,62.5789472271696" />
+        <NodeLayout
+          Size="186.666666666667,42.6666666666667"
+          Id="Package.EventHandlers[OnError]\SQL_LogErrorOnError"
+          TopLeft="529.374979017303,68.771930742572" />
+        <EdgeLayout
+          Id="Package.EventHandlers[OnError].PrecedenceConstraints[Constraint]"
+          TopLeft="229.333333333333,82.6228069469181">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="54.5416613823423,0"
+              Start="0,0"
+              End="47.0416613823423,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="47.0416613823423,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.EventHandlers[OnError].PrecedenceConstraints[Constraint 1]"
+          TopLeft="469.208328049009,87.0087723182041">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="60.1666509682941,0"
+              Start="0,0"
+              End="52.6666509682941,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="52.6666509682941,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </DtsEventHandler>
+  <TaskHost
+    design-time-name="Package\DFT_Load_Sat">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="126.666666666667,42.6666666666667"
+          Id="Package\DFT_Load_Sat\LKP_SAT"
+          TopLeft="271.24998787418,36.2631574965746" />
+        <NodeLayout
+          Size="128,42.6666666666667"
+          Id="Package\DFT_Load_Sat\OLE_DST"
+          TopLeft="270.62498790212,297.631575679432" />
+        <NodeLayout
+          Size="171.333333333334,42.6666666666667"
+          Id="Package\DFT_Load_Sat\Union New Change"
+          TopLeft="246.249988991768,142.315787911085" />
+        <NodeLayout
+          Size="133.333333333334,42.6666666666667"
+          Id="Package\DFT_Load_Sat\ROW_CNT"
+          TopLeft="269.99998793006,221.684208092268" />
+        <NodeLayout
+          Size="161.333333333334,42.6666666666667"
+          Id="Package\DFT_Load_Sat\MULTI_Changed"
+          TopLeft="512.499977089466,136.192981231603" />
+        <NodeLayout
+          Size="129.333333333334,42.6666666666667"
+          Id="Package\DFT_Load_Sat\OLE_SRC"
+          TopLeft="33.7499984912574,31.4736838649514" />
+        <NodeLayout
+          Size="152,42.6666666666667"
+          Id="Package\DFT_Load_Sat\CMD_EndDate"
+          TopLeft="513.124977061526,217.614032969195" />
+        <NodeLayout
+          Size="186.666666666667,42.6666666666667"
+          Id="Package\DFT_Load_Sat\CSPL_DetectChanges"
+          TopLeft="496.874977787957,30.7894733461482" />
+        <EdgeLayout
+          Id="Package\DFT_Load_Sat.Paths[Multicast Output 2]"
+          TopLeft="591.145810408829,178.85964789827">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,38.7543850709252"
+              Start="0,0"
+              End="0,31.2543850709252">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,31.2543850709252" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\DFT_Load_Sat.Paths[Multicast Output 1]"
+          TopLeft="512.499977089466,160.587717904678">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-94.9166547643648,0"
+              Start="0,0"
+              End="-87.4166547643648,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="-87.4166547643648,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\DFT_Load_Sat.Paths[Lookup No Match Output]"
+          TopLeft="333.249988432974,78.9298241632413">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,63.3859637478436"
+              Start="0,0"
+              End="0,55.8859637478436">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,55.8859637478436" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-55.80638671875,22.1382943739218,111.6127734375,11.609375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\DFT_Load_Sat.Paths[Lookup Match Output]"
+          TopLeft="397.916654540847,54.8596487546947">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="98.9583232471103,0"
+              Start="0,0"
+              End="91.4583232471103,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="91.4583232471103,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-2.46222509519483,5,96.3827734375,11.609375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\DFT_Load_Sat.Paths[Changed]"
+          TopLeft="591.687477438712,73.4561400128149">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,62.7368412187886"
+              Start="0,0"
+              End="0,55.2368412187886">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,55.2368412187886" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-19.8755078125,21.7868776406443,39.751015625,11.6630859375"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\DFT_Load_Sat.Paths[Union All Output 1]"
+          TopLeft="334.29165512758,184.982454577752">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,36.701753514516"
+              Start="0,0"
+              End="0,29.201753514516">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,29.201753514516" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\DFT_Load_Sat.Paths[Row Count Output 1]"
+          TopLeft="335.645821249423,264.350874758934">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,33.280700920498"
+              Start="0,0"
+              End="0,25.780700920498">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,25.780700920498" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\DFT_Load_Sat.Paths[OLE DB Source Output]"
+          TopLeft="163.08333182459,55.2017540140963">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="108.16665604959,0"
+              Start="0,0"
+              End="100.66665604959,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="100.66665604959,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\DFT_Load_Sat\LKP_SAT">
+    <Properties>
+      <Property>
+        <Name>OverwriteParamsSQLProp</Name>
+        <Value
+          type="q2:boolean">false</Value>
+      </Property>
+      <Property>
+        <Name>UsedTableName</Name>
+        <Value
+          type="q3:string"></Value>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q4:string">0</Value>
+      </Property>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\DFT_Load_Sat\OLE_DST">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\DFT_Load_Sat\OLE_SRC">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>
