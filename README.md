@@ -15,11 +15,11 @@ This repository contains the full implementation of a proof-of-concept data ware
 ### Architecture
 
 ```
-┌─────────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+┌─────────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
 │   TaxSystemDB   │────▶│  DV_Staging   │────▶│  DV_Bronze   │────▶│  DV_Silver   │────▶│  DV_Gold     │
 │   (Source)      │     │  (Landing)    │     │  (Raw Vault) │     │  (Business   │     │  (Star       │
 │                 │     │              │     │  Hub/Sat/Link │     │   Vault)     │     │   Schema)    │
-│  9 Tables       │     │  9 STG Tables │     │  9H/10S/5L   │     │  3 PIT/1 BRG │     │  7 DIM/4 FCT │
+│  9 Tables       │     │  9 STG Tables │     │  9H/9S/5L    │     │  3 PIT/1 BRG │     │  7 DIM/4 FCT │
 └─────────────────┘     └──────────────┘     └──────────────┘     │  2 BUS       │     └──────────────┘
                                                                    └──────────────┘
                          ◄──────────── ETL_Control (Logging, Watermarks, Error Handling) ──────────────►
@@ -32,8 +32,8 @@ This repository contains the full implementation of a proof-of-concept data ware
 | Full Load | 336,677 records in 120.9s (2,785 rec/s) |
 | Incremental Load | 206,780 records in 93.6s (2,209 rec/s) |
 | Query Speedup (Gold vs Raw Vault) | 1.03× – 8.3× |
-| Total Database Objects | 50 tables across 6 databases |
-| SSIS Packages | 49 child packages + 3 master packages |
+| Total Database Objects | 67 across 6 databases |
+| SSIS Packages | 60 total (3 master + 8 orchestrator + 49 child) |
 
 ---
 
@@ -142,7 +142,7 @@ The ETL pipeline is executed entirely through **SSIS packages** in Visual Studio
 | **TaxSystemDB** | Source system (simulated) | 9 tables (3 lookup + 3 reference + 3 transaction) |
 | **ETL_Control** | Pipeline orchestration | BatchLog, StepLog, ErrorLog, Watermark, Configuration |
 | **DV_Staging** | Landing zone | 9 staging tables (truncate & reload / watermark delta) |
-| **DV_Bronze** | Raw Data Vault | 9 Hubs, 10 Satellites, 5 Links |
+| **DV_Bronze** | Raw Data Vault | 9 Hubs, 9 Satellites, 5 Links |
 | **DV_Silver** | Business Vault | 3 PIT tables, 1 Bridge, 2 Business Vault tables |
 | **DV_Gold** | Star Schema | 7 Dimensions (5 SCD1 + 2 SCD2), 4 Fact tables |
 
@@ -162,14 +162,14 @@ The ETL pipeline is executed entirely through **SSIS packages** in Visual Studio
 - **Error handling**: Centralized error logging with severity classification (SSIS OnError Event Handler)
 - **Configuration table**: Runtime-configurable parameters (retry attempts, thresholds)
 
-### SSIS Package Hierarchy
+### SSIS Package Hierarchy (60 Packages)
 
 ```
 Master_Complete_Pipeline.dtsx
 ├── [FULL] → Master_Full_Load.dtsx
 │   ├── STG_Full_Load_All.dtsx → 9 staging child packages
 │   ├── BRZ_Load_All_Hubs.dtsx → 9 hub child packages
-│   ├── BRZ_Load_All_Satellites.dtsx → 9 satellite child packages (+ 1 risk level)
+│   ├── BRZ_Load_All_Satellites.dtsx → 9 satellite child packages
 │   ├── BRZ_Load_All_Links.dtsx → 5 link child packages
 │   ├── SLV_Load_All.dtsx → 6 silver child packages
 │   ├── GLD_Load_All_Dimensions.dtsx → 7 dimension child packages
@@ -177,9 +177,11 @@ Master_Complete_Pipeline.dtsx
 │
 └── [INCREMENTAL] → Master_Incremental_Load.dtsx
     └── (same structure, watermark-based delta extraction)
+
+Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 ```
 
-> **Note**: SSIS `.dtsx` package files are not included in this repository. The `ssis-guide/Technical_Implementation_Guide.docx` provides complete step-by-step instructions to build all 49+ packages in Visual Studio, including every variable, expression, parameter binding, data flow component configuration, and OnError event handler.
+> **Note**: SSIS `.dtsx` package files are not included in this repository. The `ssis-guide/Technical_Implementation_Guide.docx` provides complete step-by-step instructions to build all 60 packages in Visual Studio, including every variable, expression, parameter binding, data flow component configuration, and OnError event handler.
 
 ---
 
@@ -193,17 +195,17 @@ Master_Complete_Pipeline.dtsx
 | **Total Duration** | 120.9s | 93.6s |
 | **Throughput** | 2,785 rec/s | 2,209 rec/s |
 | Staging Layer | 22.8s (58,813 records) | 6.0s (58,824 records) |
-| Bronze Layer | 39.5s (184,108 records) | 30.3s (41 records) |
+| Bronze Layer | 39.5s (184,108 records) | 30.3s (50 records) |
 | Silver Layer | 3.4s (2,004 records) | 3.5s (57,186 records) |
 | Gold Layer | 11.0s (91,752 records) | 12.7s (90,729 records) |
 
 ### Query Performance (Gold Star Schema vs Raw Vault)
 
-| Query Complexity | Gold (ms) | Raw Vault (ms) | Speedup |
-|-----------------|-----------|----------------|---------|
-| Simple (single taxpayer lookup) | 24 | 199 | **8.3×** |
-| Medium (category aggregation) | 18 | 123 | **6.8×** |
-| Complex (full cross-tab, 38K rows) | 771 | 798 | **1.03×** |
+| Query Complexity | Query Description | Gold (ms) | Raw Vault (ms) | Speedup |
+|-----------------|-------------------|-----------|----------------|---------|
+| Simple | Total tax by category (2-table join) | 24 | 199 | **8.3×** |
+| Medium | Top 10 taxpayers by payment (4-table join) | 18 | 123 | **6.8×** |
+| Complex | Monthly revenue trend with category and status (4-table join) | 771 | 798 | **1.03×** |
 
 ---
 
