@@ -4,7 +4,7 @@
 
 **Author:** Sot So
 **Advisor:** Mr. Chap Chanpiseth
-**Institution:** Royal University of Phnom Penh — Master of Engineering in Data Science and Engineering
+**Institution:** Royal University of Phnom Penh — Master of Science in Data Science and Engineering
 **Date:** February 2026
 
 ---

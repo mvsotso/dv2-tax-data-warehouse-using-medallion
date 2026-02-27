@@ -42,31 +42,63 @@ This repository contains the full implementation of a proof-of-concept data ware
 ```
 dv2-tax-data-warehouse-using-medallion/
 │
-├── sql-scripts/                          # Core SQL implementation (execute in order)
-│   ├── 00_CleanAll_FreshFullLoad.sql      # Reset all databases for fresh start
-│   ├── 01_CreateDatabaseStructure.sql     # Source database (TaxSystemDB) DDL
-│   ├── 02_TransactionData.sql             # Simulated tax data (1,000 taxpayers)
-│   ├── 03_ETL_Control_Setup.sql           # ETL Control framework (logging, watermarks)
-│   └── 04_DDL_Architecture_DW.sql         # Data warehouse DDL (Staging/Bronze/Silver/Gold)
+├── DV2_TaxSystem/                         # SSIS Project (60 packages + project files)
+│   ├── DataVaultDWH_TaxSystem.dtproj       # Visual Studio SSIS project file
+│   ├── DataVaultDWH_TaxSystem.slnx         # Solution file
+│   ├── DataVaultDWH_TaxSystem.database     # Database reference
+│   ├── Project.params                      # SSIS project parameters
+│   ├── CM_*.conmgr                         # 7 connection managers
+│   ├── Master_Complete_Pipeline.dtsx       # Top-level orchestrator
+│   ├── Master_Full_Load.dtsx               # Full load orchestrator
+│   ├── Master_Incremental_Load.dtsx        # Incremental load orchestrator
+│   ├── STG_*.dtsx                          # 11 staging packages (9 child + 2 orchestrator)
+│   ├── BRZ_*.dtsx                          # 26 bronze packages (23 child + 3 orchestrator)
+│   ├── SLV_*.dtsx                          # 7 silver packages (6 child + 1 orchestrator)
+│   └── GLD_*.dtsx                          # 13 gold packages (11 child + 2 orchestrator)
 │
-├── verification/                          # Testing and validation scripts
-│   ├── 10_Verify_FullLoad.sql             # Full load verification queries
-│   ├── 11_Verify_IncrementalLoad.sql      # Incremental load verification
-│   ├── 11_Verify_IncrementalLoad_Clean.sql # Clean verification for screenshots
-│   └── 12_IncrementalTest_SourceChanges.sql # Delta test data for incremental loads
+├── Scripts/
+│   ├── sql-scripts/                        # Core SQL implementation (execute in order)
+│   │   ├── 00_CleanAll_FreshFullLoad.sql    # Reset all databases for fresh start
+│   │   ├── 01_CreateDatabaseStructure.sql   # Source database (TaxSystemDB) DDL
+│   │   ├── 02_TransactionData.sql           # Simulated tax data (1,000 taxpayers)
+│   │   ├── 03_ETL_Control_Setup.sql         # ETL Control framework (logging, watermarks)
+│   │   ├── 04_DDL_Architecture_DW.sql       # Data warehouse DDL (Staging/Bronze/Silver/Gold)
+│   │   ├── 05_ETL_Staging_Procedures.sql    # Staging layer stored procedures
+│   │   ├── 06_ETL_Bronze_Procedures.sql     # Bronze layer stored procedures
+│   │   ├── 07_ETL_Silver_Procedures.sql     # Silver layer stored procedures
+│   │   ├── 08_ETL_Gold_Procedures.sql       # Gold layer stored procedures
+│   │   └── 09_ETL_Master_Orchestration.sql  # Master orchestration stored procedures
+│   │
+│   └── verification/                       # Testing and validation scripts
+│       ├── 10_Verify_FullLoad.sql           # Full load verification queries
+│       ├── 11_Verify_IncrementalLoad.sql    # Incremental load verification
+│       ├── 11_Verify_IncrementalLoad_Clean.sql # Clean verification for screenshots
+│       └── 12_IncrementalTest_SourceChanges.sql # Delta test data for incremental loads
 │
-├── benchmarks/                            # Performance benchmarking
-│   ├── Benchmarks_Verification.sql        # Benchmark queries (ETL + query performance)
-│   └── Benchmarks_Verification.docx       # Results with SSMS screenshots
+├── Benchmarks/                             # Performance benchmarking
+│   ├── Metric Benchmarks Verification.docx  # Key metric benchmark results
+│   ├── Metric Benchmarks Verification.sql   # Benchmark queries (ETL + query performance)
+│   ├── Source_Database_Verification.docx    # Source database verification results
+│   └── Source_Database_Verification.sql     # Source database verification queries
 │
-├── ssis-guide/                            # SSIS package implementation guide
-│   └── Technical_Implementation_Guide.docx # Step-by-step SSIS build instructions
+├── Proof Of Concepts/                      # POC demonstrations (Chapter 5)
+│   ├── 13_POC_Demonstrations.sql            # All 4 POC challenge demonstrations
+│   ├── POC_Implementation_Guide.docx        # Step-by-step POC guide
+│   └── POC_Implementation_Guide.md          # POC guide (Markdown version)
 │
-├── docs/                                  # Thesis documents
-│   ├── Final_Report.docx                  # Complete thesis report (6 chapters)
-│   ├── Final_Presentation.pptx            # Defense presentation (18 slides)
-│   ├── Thesis_Defense_Preparation.docx    # Q&A preparation (18 questions)
-│   └── Deployment_Operations_Guide.docx   # GCP VM deployment guide
+├── Documents/                              # Thesis documents
+│   ├── Final_Report.docx                    # Complete thesis report (6 chapters)
+│   ├── Final_Presentation.pptx              # Defense presentation (18 slides)
+│   ├── Technical_Implementation_Guide.docx  # Step-by-step SSIS build instructions
+│   ├── Deployment_Operations_Guide.docx     # GCP VM deployment guide
+│   ├── Thesis_Defense_Preparation.docx      # Q&A preparation (18 questions)
+│   └── Figure_3_1.pptx                      # Architecture diagram (editable)
+│
+├── Figures/                                # Chapter 5 POC screenshots
+│   ├── Figure_5.1_Schema_Flexibility.png    # Challenge 1: Schema flexibility demo
+│   ├── Figure_5.2_Historical_Tracking.png   # Challenge 2: Historical tracking demo
+│   ├── Figure_5.3_ETL_Control_Framework.png # Challenge 3: ETL control framework demo
+│   └── Figure_5.4_Business_Rules.png        # Challenge 4: Business rules separation demo
 │
 ├── .gitignore
 ├── LICENSE
@@ -90,45 +122,48 @@ Execute the SQL scripts in numerical order against your SQL Server instance:
 
 ```bash
 # Step 1: Create source database and load test data
-sqlcmd -S localhost -i sql-scripts/01_CreateDatabaseStructure.sql
-sqlcmd -S localhost -i sql-scripts/02_TransactionData.sql
+sqlcmd -S localhost -i Scripts/sql-scripts/01_CreateDatabaseStructure.sql
+sqlcmd -S localhost -i Scripts/sql-scripts/02_TransactionData.sql
 
 # Step 2: Create ETL control framework
-sqlcmd -S localhost -i sql-scripts/03_ETL_Control_Setup.sql
+sqlcmd -S localhost -i Scripts/sql-scripts/03_ETL_Control_Setup.sql
 
 # Step 3: Create data warehouse databases (Staging, Bronze, Silver, Gold)
-sqlcmd -S localhost -i sql-scripts/04_DDL_Architecture_DW.sql
+sqlcmd -S localhost -i Scripts/sql-scripts/04_DDL_Architecture_DW.sql
 
-# Step 4: Build and run SSIS packages (see ssis-guide/)
+# Step 4: Open DV2_TaxSystem/ project in Visual Studio and run SSIS packages
 ```
 
 ### Running the ETL Pipeline
 
-The ETL pipeline is executed entirely through **SSIS packages** in Visual Studio:
+The ETL pipeline is executed through **SSIS packages** in Visual Studio:
 
 1. **Full Load** (first-time load of all data)
-   - Open the SSIS solution in Visual Studio
+   - Open `DV2_TaxSystem/DataVaultDWH_TaxSystem.dtproj` in Visual Studio
    - Run `Master_Complete_Pipeline.dtsx` → selects the Full Load path
    - All 49 steps execute across Staging → Bronze → Silver → Gold
 
 2. **Incremental Load** (delta changes only)
-   - Apply test changes first: run `verification/12_IncrementalTest_SourceChanges.sql` in SSMS
+   - Apply test changes first: run `Scripts/verification/12_IncrementalTest_SourceChanges.sql` in SSMS
    - Run `Master_Complete_Pipeline.dtsx` → selects the Incremental Load path
    - Watermark-based delta extraction processes only changed records
 
-> See `ssis-guide/Technical_Implementation_Guide.docx` for complete step-by-step package build instructions.
+> See `Documents/Technical_Implementation_Guide.docx` for complete step-by-step package build instructions.
 
 ### Verifying Results
 
 ```sql
 -- After Full Load
--- Run: verification/10_Verify_FullLoad.sql
+-- Run: Scripts/verification/10_Verify_FullLoad.sql
 
 -- After Incremental Load
--- Run: verification/11_Verify_IncrementalLoad.sql
+-- Run: Scripts/verification/11_Verify_IncrementalLoad.sql
 
 -- Performance Benchmarks
--- Run: benchmarks/Benchmarks_Verification.sql
+-- Run: Benchmarks/Metric Benchmarks Verification.sql
+
+-- POC Demonstrations (Chapter 5)
+-- Run: Proof Of Concepts/13_POC_Demonstrations.sql
 ```
 
 ---
@@ -172,7 +207,7 @@ Master_Complete_Pipeline.dtsx
 │   ├── BRZ_Load_All_Satellites.dtsx → 9 satellite child packages
 │   ├── BRZ_Load_All_Links.dtsx → 5 link child packages
 │   ├── SLV_Load_All.dtsx → 6 silver child packages
-│   ├── GLD_Load_All_Dimensions.dtsx → 7 dimension child packages
+│   ├── GLD_Load_All_Dimentions.dtsx → 7 dimension child packages
 │   └── GLD_Load_All_Facts.dtsx → 4 fact child packages
 │
 └── [INCREMENTAL] → Master_Incremental_Load.dtsx
@@ -180,8 +215,6 @@ Master_Complete_Pipeline.dtsx
 
 Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 ```
-
-> **Note**: SSIS `.dtsx` package files are not included in this repository. The `ssis-guide/Technical_Implementation_Guide.docx` provides complete step-by-step instructions to build all 60 packages in Visual Studio, including every variable, expression, parameter binding, data flow component configuration, and OnError event handler.
 
 ---
 
@@ -213,12 +246,13 @@ Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 
 | Document | Description |
 |----------|-------------|
-| [Final Report](docs/Final_Report.docx) | Complete 6-chapter thesis (~80 pages) |
-| [Final Presentation](docs/Final_Presentation.pptx) | 18-slide defense presentation with speaker notes |
-| [Technical Implementation Guide](ssis-guide/Technical_Implementation_Guide.docx) | Step-by-step SSIS package build guide (~150 pages) |
-| [Deployment Guide](docs/Deployment_Operations_Guide.docx) | Google Cloud Platform VM deployment |
-| [Benchmark Results](benchmarks/Benchmarks_Verification.docx) | SSMS screenshots of all benchmark runs |
-| [Defense Preparation](docs/Thesis_Defense_Preparation.docx) | 18 potential Q&A for thesis defense |
+| [Final Report](Documents/Final_Report.docx) | Complete 6-chapter thesis (~80 pages) |
+| [Final Presentation](Documents/Final_Presentation.pptx) | 18-slide defense presentation with speaker notes |
+| [Technical Implementation Guide](Documents/Technical_Implementation_Guide.docx) | Step-by-step SSIS package build guide (~150 pages) |
+| [Deployment Guide](Documents/Deployment_Operations_Guide.docx) | Google Cloud Platform VM deployment |
+| [Defense Preparation](Documents/Thesis_Defense_Preparation.docx) | 18 potential Q&A for thesis defense |
+| [POC Implementation Guide](Proof%20Of%20Concepts/POC_Implementation_Guide.md) | Step-by-step guide for 4 POC demonstrations |
+| [Benchmark Verification](Benchmarks/Metric%20Benchmarks%20Verification.docx) | Key metric benchmark results with screenshots |
 
 ---
 
@@ -243,7 +277,7 @@ This implementation is based on:
 - Kimball, R. & Ross, M. (2013). *The Data Warehouse Toolkit*, 3rd Edition
 - Inmon, W.H. (2005). *Building the Data Warehouse*, 4th Edition
 
-Full reference list (34 citations) available in the [Final Report](docs/Final_Report.docx).
+Full reference list (34 citations) available in the [Final Report](Documents/Final_Report.docx).
 
 ---
 
@@ -251,7 +285,7 @@ Full reference list (34 citations) available in the [Final Report](docs/Final_Re
 
 **Mr. Sot So**
 - Chief of Data Management Bureau, General Department of Taxation, Cambodia
-- Master of Engineering in Data Science and Engineering
+- Master of Science in Data Science and Engineering
 - Royal University of Phnom Penh
 
 **Supervisor**: Mr. Chap Chanpiseth
