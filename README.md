@@ -42,63 +42,126 @@ This repository contains the full implementation of a proof-of-concept data ware
 ```
 dv2-tax-data-warehouse-using-medallion/
 │
-├── DV2_TaxSystem/                         # SSIS Project (60 packages + project files)
-│   ├── DataVaultDWH_TaxSystem.dtproj       # Visual Studio SSIS project file
-│   ├── DataVaultDWH_TaxSystem.slnx         # Solution file
-│   ├── DataVaultDWH_TaxSystem.database     # Database reference
-│   ├── Project.params                      # SSIS project parameters
-│   ├── CM_*.conmgr                         # 7 connection managers
-│   ├── Master_Complete_Pipeline.dtsx       # Top-level orchestrator
-│   ├── Master_Full_Load.dtsx               # Full load orchestrator
-│   ├── Master_Incremental_Load.dtsx        # Incremental load orchestrator
-│   ├── STG_*.dtsx                          # 11 staging packages (9 child + 2 orchestrator)
-│   ├── BRZ_*.dtsx                          # 26 bronze packages (23 child + 3 orchestrator)
-│   ├── SLV_*.dtsx                          # 7 silver packages (6 child + 1 orchestrator)
-│   └── GLD_*.dtsx                          # 13 gold packages (11 child + 2 orchestrator)
+├── DV2_TaxSystem/                              # SSIS Project (60 packages + project files)
+│   ├── DataVaultDWH_TaxSystem.dtproj            # Visual Studio SSIS project file
+│   ├── DataVaultDWH_TaxSystem.slnx              # Solution file
+│   ├── DataVaultDWH_TaxSystem.database          # Database reference
+│   ├── Project.params                           # SSIS project parameters
+│   │
+│   ├── CM_TaxSystemDB.conmgr                    # 7 connection managers
+│   ├── CM_ETL_Control.conmgr                    #   ETL Control database
+│   ├── CM_ETL_Control_OnError.conmgr            #   Separate connection for OnError handlers
+│   ├── CM_DV_Staging.conmgr                     #   Staging database
+│   ├── CM_DV_Bronze.conmgr                      #   Bronze database
+│   ├── CM_DV_Silver.conmgr                      #   Silver database
+│   ├── CM_DV_Gold.conmgr                        #   Gold database
+│   │
+│   ├── Master_Complete_Pipeline.dtsx            # 3 master packages
+│   ├── Master_Full_Load.dtsx                    #   Full load path
+│   ├── Master_Incremental_Load.dtsx             #   Incremental load path
+│   │
+│   ├── STG_Full_Load_All.dtsx                   # 11 staging packages (9 child + 2 orchestrator)
+│   ├── STG_Incremental_Load_All.dtsx            #   Orchestrators: full & incremental
+│   ├── STG_Category.dtsx                        #   Child: 3 lookup tables
+│   ├── STG_Structure.dtsx                       #
+│   ├── STG_Activity.dtsx                        #
+│   ├── STG_Taxpayer.dtsx                        #   Child: 6 core tables
+│   ├── STG_Owner.dtsx                           #
+│   ├── STG_Officer.dtsx                         #
+│   ├── STG_MonthlyDeclaration.dtsx              #
+│   ├── STG_AnnualDeclaration.dtsx               #
+│   ├── STG_Payment.dtsx                         #
+│   │
+│   ├── BRZ_Load_All_Hubs.dtsx                   # 26 bronze packages (23 child + 3 orchestrator)
+│   ├── BRZ_Load_All_Satellites.dtsx             #   Orchestrators: hubs, sats, links
+│   ├── BRZ_Load_All_Links.dtsx                  #
+│   ├── BRZ_HUB_Category.dtsx                    #   Child: 9 hub packages
+│   ├── BRZ_HUB_Structure.dtsx                   #
+│   ├── BRZ_HUB_Activity.dtsx                    #
+│   ├── BRZ_HUB_Taxpayer.dtsx                    #
+│   ├── BRZ_HUB_Owner.dtsx                       #
+│   ├── BRZ_HUB_Officer.dtsx                     #
+│   ├── BRZ_HUB_Declaration.dtsx                 #
+│   ├── BRZ_HUB_AnnualDeclaration.dtsx           #
+│   ├── BRZ_HUB_Payment.dtsx                     #
+│   ├── BRZ_SAT_Category.dtsx                    #   Child: 9 satellite packages
+│   ├── BRZ_SAT_Structure.dtsx                   #
+│   ├── BRZ_SAT_Activity.dtsx                    #
+│   ├── BRZ_SAT_Taxpayer.dtsx                    #
+│   ├── BRZ_SAT_Owner.dtsx                       #
+│   ├── BRZ_SAT_Officer.dtsx                     #
+│   ├── BRZ_SAT_MonthlyDecl.dtsx                 #
+│   ├── BRZ_SAT_AnnualDecl.dtsx                  #
+│   ├── BRZ_SAT_Payment.dtsx                     #
+│   ├── BRZ_LNK_TaxpayerDeclaration.dtsx         #   Child: 5 link packages
+│   ├── BRZ_LNK_DeclarationPayment.dtsx          #
+│   ├── BRZ_LNK_TaxpayerOfficer.dtsx             #
+│   ├── BRZ_LNK_TaxpayerOwner.dtsx               #
+│   ├── BRZ_LNK_TaxpayerAnnualDecl.dtsx          #
+│   │
+│   ├── SLV_Load_All.dtsx                        # 7 silver packages (6 child + 1 orchestrator)
+│   ├── SLV_PIT_Taxpayer.dtsx                    #   Child: 3 PIT tables
+│   ├── SLV_PIT_Declaration.dtsx                 #
+│   ├── SLV_PIT_Payment.dtsx                     #
+│   ├── SLV_BRG_Taxpayer_Owner.dtsx              #   Child: 1 bridge table
+│   ├── SLV_BUS_ComplianceScore.dtsx             #   Child: 2 business vault tables
+│   ├── SLV_BUS_MonthlyMetrics.dtsx              #
+│   │
+│   ├── GLD_Load_All_Dimentions.dtsx             # 13 gold packages (11 child + 2 orchestrator)
+│   ├── GLD_Load_All_Facts.dtsx                  #   Orchestrators: dimensions & facts
+│   ├── GLD_DIM_Category.dtsx                    #   Child: 7 dimension packages (5 SCD1 + 2 SCD2)
+│   ├── GLD_DIM_Structure.dtsx                   #
+│   ├── GLD_DIM_Activity.dtsx                    #
+│   ├── GLD_DIM_PaymentMethod.dtsx               #
+│   ├── GLD_DIM_Status.dtsx                      #
+│   ├── GLD_DIM_Taxpayer.dtsx                    #   SCD Type 2
+│   ├── GLD_DIM_Officer.dtsx                     #   SCD Type 2
+│   ├── GLD_FACT_MonthlyDeclaration.dtsx         #   Child: 4 fact packages
+│   ├── GLD_FACT_Payment.dtsx                    #
+│   ├── GLD_FACT_MonthlySnapshot.dtsx            #
+│   └── GLD_FACT_DeclarationLifecycle.dtsx       #
 │
 ├── Scripts/
-│   ├── sql-scripts/                        # Core SQL implementation (execute in order)
-│   │   ├── 00_CleanAll_FreshFullLoad.sql    # Reset all databases for fresh start
-│   │   ├── 01_CreateDatabaseStructure.sql   # Source database (TaxSystemDB) DDL
-│   │   ├── 02_TransactionData.sql           # Simulated tax data (1,000 taxpayers)
-│   │   ├── 03_ETL_Control_Setup.sql         # ETL Control framework (logging, watermarks)
-│   │   ├── 04_DDL_Architecture_DW.sql       # Data warehouse DDL (Staging/Bronze/Silver/Gold)
-│   │   ├── 05_ETL_Staging_Procedures.sql    # Staging layer stored procedures
-│   │   ├── 06_ETL_Bronze_Procedures.sql     # Bronze layer stored procedures
-│   │   ├── 07_ETL_Silver_Procedures.sql     # Silver layer stored procedures
-│   │   ├── 08_ETL_Gold_Procedures.sql       # Gold layer stored procedures
-│   │   └── 09_ETL_Master_Orchestration.sql  # Master orchestration stored procedures
+│   ├── sql-scripts/                             # Core SQL implementation (execute in order)
+│   │   ├── 00_CleanAll_FreshFullLoad.sql         # Reset all 6 databases for fresh start
+│   │   ├── 01_CreateDatabaseStructure.sql        # Source database (TaxSystemDB) DDL
+│   │   ├── 02_TransactionData.sql                # Simulated tax data (1,000 taxpayers)
+│   │   ├── 03_ETL_Control_Setup.sql              # ETL Control framework v3.2 (logging, watermarks)
+│   │   └── 04_DDL_Architecture_DW.sql            # Data warehouse DDL (Staging/Bronze/Silver/Gold)
 │   │
-│   └── verification/                       # Testing and validation scripts
-│       ├── 10_Verify_FullLoad.sql           # Full load verification queries
-│       ├── 11_Verify_IncrementalLoad.sql    # Incremental load verification
-│       ├── 11_Verify_IncrementalLoad_Clean.sql # Clean verification for screenshots
-│       └── 12_IncrementalTest_SourceChanges.sql # Delta test data for incremental loads
+│   └── verification/                            # Testing and validation scripts
+│       ├── 10_Verify_FullLoad.sql                # Full load verification (7 checks)
+│       ├── 11_Verify_IncrementalLoad.sql         # Incremental load verification (8 checks)
+│       ├── 11_Verify_IncrementalLoad_Clean.sql   # Clean incremental verification for screenshots
+│       ├── 12_IncrementalTest_SourceChanges.sql  # Delta test data for incremental loads
+│       └── Screenshot_Source_DB_AllGrids.sql     # Source DB screenshot helper queries
 │
-├── Benchmarks/                             # Performance benchmarking
-│   ├── Metric Benchmarks Verification.docx  # Key metric benchmark results
-│   ├── Metric Benchmarks Verification.sql   # Benchmark queries (ETL + query performance)
-│   ├── Source_Database_Verification.docx    # Source database verification results
-│   └── Source_Database_Verification.sql     # Source database verification queries
+├── Benchmarks/                                  # Performance benchmarking
+│   ├── Benchmark_Walkthrough.sql                 # Step-by-step benchmark execution guide
+│   ├── Metric Benchmarks Verification.sql        # Benchmark queries (ETL + query performance)
+│   ├── Metric Benchmarks Verification.docx       # Benchmark results with screenshots
+│   ├── Screenshot_Benchmarks_AllGrids.sql        # Benchmark screenshot helper queries
+│   ├── Source_Database_Verification.sql          # Source database validation (12-point checklist)
+│   └── Source_Database_Verification.docx         # Source DB verification results
 │
-├── Proof Of Concepts/                      # POC demonstrations (Chapter 5)
-│   ├── 13_POC_Demonstrations.sql            # All 4 POC challenge demonstrations
-│   ├── POC_Implementation_Guide.docx        # Step-by-step POC guide
-│   └── POC_Implementation_Guide.md          # POC guide (Markdown version)
+├── Proof Of Concepts/                           # POC demonstrations (Chapter 5)
+│   ├── 13_POC_Demonstrations.sql                 # All 4 POC challenge demonstrations
+│   └── POC_Implementation_Guide.docx             # Step-by-step POC guide
 │
-├── Documents/                              # Thesis documents
-│   ├── Final_Report.docx                    # Complete thesis report (6 chapters)
-│   ├── Final_Presentation.pptx              # Defense presentation (18 slides)
-│   ├── Technical_Implementation_Guide.docx  # Step-by-step SSIS build instructions
-│   ├── Deployment_Operations_Guide.docx     # GCP VM deployment guide
-│   ├── Thesis_Defense_Preparation.docx      # Q&A preparation (18 questions)
-│   └── Figure_3_1.pptx                      # Architecture diagram (editable)
+├── Documents/                                   # Thesis documents
+│   ├── Final_Report.docx                         # Complete thesis report (6 chapters, ~80 pages)
+│   ├── Final_Presentation.pptx                   # Defense presentation (15 slides)
+│   ├── Technical_Implementation_Guide.docx       # SSIS package build guide (~150 pages)
+│   ├── Deployment_Operations_Guide.docx          # Google Cloud VM deployment & benchmarks
+│   ├── Thesis_Defense_Preparation.docx           # Q&A preparation (18 questions)
+│   └── Figure_3_1.pptx                           # Architecture diagram (editable)
 │
-├── Figures/                                # Chapter 5 POC screenshots
-│   ├── Figure_5.1_Schema_Flexibility.png    # Challenge 1: Schema flexibility demo
-│   ├── Figure_5.2_Historical_Tracking.png   # Challenge 2: Historical tracking demo
-│   ├── Figure_5.3_ETL_Control_Framework.png # Challenge 3: ETL control framework demo
-│   └── Figure_5.4_Business_Rules.png        # Challenge 4: Business rules separation demo
+├── Figures/                                     # Chapter 5 POC screenshots
+│   ├── Figure_5.1_Schema_Flexibility.png         # Challenge 1: Schema flexibility demo
+│   ├── Figure_5.2_Historical_Tracking.png        # Challenge 2: Historical tracking demo
+│   ├── Figure_5.3_ETL_Control_Framework.png      # Challenge 3: ETL control framework demo
+│   ├── Figure_5.4_Business_Rules.png             # Challenge 4: Business rules separation demo
+│   └── Screenshot_Capture_Guide.docx             # Guide for capturing SSMS screenshots
 │
 ├── .gitignore
 ├── LICENSE
@@ -132,6 +195,8 @@ sqlcmd -S localhost -i Scripts/sql-scripts/03_ETL_Control_Setup.sql
 sqlcmd -S localhost -i Scripts/sql-scripts/04_DDL_Architecture_DW.sql
 
 # Step 4: Open DV2_TaxSystem/ project in Visual Studio and run SSIS packages
+# Note: ETL stored procedures (staging, bronze, silver, gold, orchestration)
+# are embedded within the SSIS packages and execute via Execute SQL Tasks.
 ```
 
 ### Running the ETL Pipeline
@@ -247,11 +312,11 @@ Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 | Document | Description |
 |----------|-------------|
 | [Final Report](Documents/Final_Report.docx) | Complete 6-chapter thesis (~80 pages) |
-| [Final Presentation](Documents/Final_Presentation.pptx) | 18-slide defense presentation with speaker notes |
+| [Final Presentation](Documents/Final_Presentation.pptx) | 15-slide defense presentation with speaker notes |
 | [Technical Implementation Guide](Documents/Technical_Implementation_Guide.docx) | Step-by-step SSIS package build guide (~150 pages) |
 | [Deployment Guide](Documents/Deployment_Operations_Guide.docx) | Google Cloud Platform VM deployment |
 | [Defense Preparation](Documents/Thesis_Defense_Preparation.docx) | 18 potential Q&A for thesis defense |
-| [POC Implementation Guide](Proof%20Of%20Concepts/POC_Implementation_Guide.md) | Step-by-step guide for 4 POC demonstrations |
+| [POC Implementation Guide](Proof%20Of%20Concepts/POC_Implementation_Guide.docx) | Step-by-step guide for 4 POC demonstrations |
 | [Benchmark Verification](Benchmarks/Metric%20Benchmarks%20Verification.docx) | Key metric benchmark results with screenshots |
 
 ---
