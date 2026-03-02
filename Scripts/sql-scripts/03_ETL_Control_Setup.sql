@@ -940,7 +940,7 @@ CREATE INDEX IX_ETL_AlertLog_IsSent ON ETL_AlertLog(IsSent) WHERE IsSent = 0; --
 
 PRINT '';
 PRINT '========================================';
-PRINT 'ETL Control Framework V3.1 created successfully!';
+PRINT 'ETL Control Framework V3.2 created successfully!';
 PRINT 'ENHANCEMENTS:';
 PRINT '  ✓ Configuration table with helper functions';
 PRINT '  ✓ Retry logic with configurable attempts';

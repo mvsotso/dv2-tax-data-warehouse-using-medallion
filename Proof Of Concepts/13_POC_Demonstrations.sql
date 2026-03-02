@@ -3,13 +3,13 @@
 -- ══════════════════════════════════════════════════════════════════════════════
 -- Author:      Sot So
 -- Advisor:     Mr. Chap Chanpiseth
--- Institution: Royal University of Phnom Penh — MEng Data Science & Engineering
+-- Institution: Royal University of Phnom Penh — MSc Data Science and Engineering
 -- Date:        February 2026
 -- Purpose:     Reproduce all 4 POC demonstrations from Chapter 5, Section 5.2
 --
 -- PREREQUISITES:
---   1. All 6 databases created via scripts 00-04 (TaxSystemDB, DV_Staging,
---      DV_Bronze, DV_Silver, DV_Gold, DV_Control)
+--   1. All 6 databases created via scripts 01-04 (TaxSystemDB, ETL_Control,
+--      DV_Staging, DV_Bronze, DV_Silver, DV_Gold)
 --   2. Full Load pipeline executed successfully (script 00 or scripts 05-09)
 --   3. ETL Control Framework deployed (script 03)
 --
@@ -268,12 +268,12 @@ TRUNCATE TABLE STG_Taxpayer;
 
 INSERT INTO STG_Taxpayer 
     (TaxpayerID, TaxID, LegalBusinessName, TradingName, CategoryID, StructureID,
-     RegistrationDate, EstimatedAnnualRevenue, IsActive, RecordSource, STG_LoadDate)
+     RegistrationDate, EstimatedAnnualRevenue, IsActive, CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
 SELECT 
     TaxpayerID, TaxID, LegalBusinessName, TradingName, CategoryID, StructureID,
-    RegistrationDate, EstimatedAnnualRevenue, IsActive,
+    RegistrationDate, EstimatedAnnualRevenue, IsActive, CreatedDate, UpdatedDate, SourceSystem,
     'TaxSystemDB' AS RecordSource,
-    GETDATE() AS STG_LoadDate
+    GETDATE() AS LoadDateTime
 FROM TaxSystemDB.dbo.Taxpayer;
 
 PRINT '   ✓ STG_Taxpayer reloaded: ' + CAST(@@ROWCOUNT AS VARCHAR) + ' rows';
@@ -331,9 +331,9 @@ GO
 TRUNCATE TABLE STG_Taxpayer;
 INSERT INTO STG_Taxpayer 
     (TaxpayerID, TaxID, LegalBusinessName, TradingName, CategoryID, StructureID,
-     RegistrationDate, EstimatedAnnualRevenue, IsActive, RecordSource, STG_LoadDate)
+     RegistrationDate, EstimatedAnnualRevenue, IsActive, CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
 SELECT TaxpayerID, TaxID, LegalBusinessName, TradingName, CategoryID, StructureID,
-    RegistrationDate, EstimatedAnnualRevenue, IsActive, 'TaxSystemDB', GETDATE()
+    RegistrationDate, EstimatedAnnualRevenue, IsActive, CreatedDate, UpdatedDate, SourceSystem, 'TaxSystemDB', GETDATE()
 FROM TaxSystemDB.dbo.Taxpayer;
 PRINT '   ✓ STG_Taxpayer reloaded: ' + CAST(@@ROWCOUNT AS VARCHAR) + ' rows';
 GO
@@ -423,7 +423,7 @@ PRINT '  POC 3: ETL Control Framework — Logging & Error Recovery';
 PRINT '══════════════════════════════════════════════════════════════';
 PRINT '';
 
-USE DV_Control;
+USE ETL_Control;
 GO
 
 -- ─── Step 1: Review Current Control Tables ───
@@ -441,7 +441,7 @@ PRINT '─── Step 2: Start new batch ───';
 
 DECLARE @POC_BatchID INT;
 EXEC usp_StartBatch 
-    @ProcessName = 'POC_Staging_FullLoad',
+    @ProcessName = 'Load_Staging_Full',
     @BatchID = @POC_BatchID OUTPUT;
 
 PRINT '   ✓ Batch started: BatchID = ' + CAST(@POC_BatchID AS VARCHAR);
@@ -460,8 +460,8 @@ EXEC usp_StartStep @BatchID = @B, @StepName = 'Load_STG_Category', @StepID = @S 
 BEGIN TRY
     TRUNCATE TABLE DV_Staging.dbo.STG_Category;
     INSERT INTO DV_Staging.dbo.STG_Category 
-        (CategoryID, CategoryName, CategoryDescription, IsActive, RecordSource, STG_LoadDate)
-    SELECT CategoryID, CategoryName, CategoryDescription, IsActive, 'TaxSystemDB', GETDATE()
+        (CategoryID, CategoryName, CategoryDescription, IsActive, CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
+    SELECT CategoryID, CategoryName, CategoryDescription, IsActive, CreatedDate, UpdatedDate, 'TaxSystem', 'TaxSystemDB', GETDATE()
     FROM TaxSystemDB.dbo.Category;
     SET @RC = @@ROWCOUNT;
     EXEC usp_EndStep @StepID = @S, @Status = 'Success', @RowCount = @RC;
@@ -478,8 +478,8 @@ EXEC usp_StartStep @BatchID = @B, @StepName = 'Load_STG_Structure', @StepID = @S
 BEGIN TRY
     TRUNCATE TABLE DV_Staging.dbo.STG_Structure;
     INSERT INTO DV_Staging.dbo.STG_Structure 
-        (StructureID, StructureName, StructureDescription, IsActive, RecordSource, STG_LoadDate)
-    SELECT StructureID, StructureName, StructureDescription, IsActive, 'TaxSystemDB', GETDATE()
+        (StructureID, StructureName, StructureDescription, IsActive, CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
+    SELECT StructureID, StructureName, StructureDescription, IsActive, CreatedDate, UpdatedDate, 'TaxSystem', 'TaxSystemDB', GETDATE()
     FROM TaxSystemDB.dbo.Structure;
     SET @RC = @@ROWCOUNT;
     EXEC usp_EndStep @StepID = @S, @Status = 'Success', @RowCount = @RC;
@@ -497,9 +497,9 @@ BEGIN TRY
     TRUNCATE TABLE DV_Staging.dbo.STG_Taxpayer;
     INSERT INTO DV_Staging.dbo.STG_Taxpayer 
         (TaxpayerID, TaxID, LegalBusinessName, TradingName, CategoryID, StructureID, 
-         RegistrationDate, EstimatedAnnualRevenue, IsActive, RecordSource, STG_LoadDate)
+         RegistrationDate, EstimatedAnnualRevenue, IsActive, CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
     SELECT TaxpayerID, TaxID, LegalBusinessName, TradingName, CategoryID, StructureID, 
-           RegistrationDate, EstimatedAnnualRevenue, IsActive, 'TaxSystemDB', GETDATE()
+           RegistrationDate, EstimatedAnnualRevenue, IsActive, CreatedDate, UpdatedDate, SourceSystem, 'TaxSystemDB', GETDATE()
     FROM TaxSystemDB.dbo.Taxpayer;
     SET @RC = @@ROWCOUNT;
     EXEC usp_EndStep @StepID = @S, @Status = 'Success', @RowCount = @RC;
@@ -525,17 +525,19 @@ BEGIN CATCH
     PRINT '   ✗ Load_STG_Payment: FAILED — ' + @ErrMsg;
 END CATCH
 
--- ═══ Step 3e: Load_STG_MonthlyDecl (SUCCESS — continues despite previous failure) ═══
-EXEC usp_StartStep @BatchID = @B, @StepName = 'Load_STG_MonthlyDecl', @StepID = @S OUTPUT;
+-- ═══ Step 3e: Load_STG_MonthlyDeclaration (SUCCESS — continues despite previous failure) ═══
+EXEC usp_StartStep @BatchID = @B, @StepName = 'Load_STG_MonthlyDeclaration', @StepID = @S OUTPUT;
 BEGIN TRY
-    TRUNCATE TABLE DV_Staging.dbo.STG_MonthlyDecl;
-    INSERT INTO DV_Staging.dbo.STG_MonthlyDecl 
-        (DeclarationID, TaxpayerID, DeclarationMonth, DeclarationYear, DueDate, DeclarationDate, 
-         GrossRevenue, TaxableRevenue, TaxRate, TaxAmount, PenaltyAmount, InterestAmount, 
-         TotalAmount, Status, RecordSource, STG_LoadDate)
-    SELECT DeclarationID, TaxpayerID, DeclarationMonth, DeclarationYear, DueDate, DeclarationDate, 
-           GrossRevenue, TaxableRevenue, TaxRate, TaxAmount, PenaltyAmount, InterestAmount, 
-           TotalAmount, Status, 'TaxSystemDB', GETDATE()
+    TRUNCATE TABLE DV_Staging.dbo.STG_MonthlyDeclaration;
+    INSERT INTO DV_Staging.dbo.STG_MonthlyDeclaration 
+        (DeclarationID, TaxpayerID, DeclarationMonth, DeclarationYear, 
+         GrossRevenue, TaxableRevenue, TaxAmount, PenaltyAmount, InterestAmount, 
+         TotalAmount, DeclarationDate, DueDate, Status, OfficerID, IsActive, 
+         CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
+    SELECT DeclarationID, TaxpayerID, DeclarationMonth, DeclarationYear, 
+           GrossRevenue, TaxableRevenue, TaxAmount, PenaltyAmount, InterestAmount, 
+           TotalAmount, DeclarationDate, DueDate, Status, OfficerID, IsActive, 
+           CreatedDate, UpdatedDate, SourceSystem, 'TaxSystemDB', GETDATE()
     FROM TaxSystemDB.dbo.MonthlyDeclaration;
     SET @RC = @@ROWCOUNT;
     EXEC usp_EndStep @StepID = @S, @Status = 'Success', @RowCount = @RC;
@@ -544,18 +546,22 @@ END TRY
 BEGIN CATCH
     EXEC usp_EndStep @StepID = @S, @Status = 'Failed', @RowCount = 0;
     EXEC usp_LogError @BatchID=@B, @StepLogID=@S, @ErrorSeverity='High', 
-         @ErrorSource='Load_STG_MonthlyDecl', @ErrorMessage=N'Unexpected error';
+         @ErrorSource='Load_STG_MonthlyDeclaration', @ErrorMessage=N'Unexpected error';
 END CATCH
 
--- ═══ Step 3f: Load_STG_AnnualDecl (SUCCESS) ═══
-EXEC usp_StartStep @BatchID = @B, @StepName = 'Load_STG_AnnualDecl', @StepID = @S OUTPUT;
+-- ═══ Step 3f: Load_STG_AnnualDeclaration (SUCCESS) ═══
+EXEC usp_StartStep @BatchID = @B, @StepName = 'Load_STG_AnnualDeclaration', @StepID = @S OUTPUT;
 BEGIN TRY
-    TRUNCATE TABLE DV_Staging.dbo.STG_AnnualDecl;
-    INSERT INTO DV_Staging.dbo.STG_AnnualDecl 
-        (AnnualDeclarationID, TaxpayerID, DeclarationYear, TotalGrossRevenue, TotalTaxableRevenue, 
-         TotalTaxAmount, TotalPaymentAmount, RemainingBalance, Status, RecordSource, STG_LoadDate)
-    SELECT AnnualDeclarationID, TaxpayerID, DeclarationYear, TotalGrossRevenue, TotalTaxableRevenue, 
-           TotalTaxAmount, TotalPaymentAmount, RemainingBalance, Status, 'TaxSystemDB', GETDATE()
+    TRUNCATE TABLE DV_Staging.dbo.STG_AnnualDeclaration;
+    INSERT INTO DV_Staging.dbo.STG_AnnualDeclaration 
+        (AnnualDeclarationID, TaxpayerID, DeclarationYear, 
+         GrossRevenue, TaxableRevenue, TaxAmount, PenaltyAmount, InterestAmount, 
+         TotalAmount, DeclarationDate, DueDate, Status, OfficerID, IsActive, 
+         CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
+    SELECT AnnualDeclarationID, TaxpayerID, DeclarationYear, 
+           GrossRevenue, TaxableRevenue, TaxAmount, PenaltyAmount, InterestAmount, 
+           TotalAmount, DeclarationDate, DueDate, Status, OfficerID, IsActive, 
+           CreatedDate, UpdatedDate, SourceSystem, 'TaxSystemDB', GETDATE()
     FROM TaxSystemDB.dbo.AnnualDeclaration;
     SET @RC = @@ROWCOUNT;
     EXEC usp_EndStep @StepID = @S, @Status = 'Success', @RowCount = @RC;
@@ -564,7 +570,7 @@ END TRY
 BEGIN CATCH
     EXEC usp_EndStep @StepID = @S, @Status = 'Failed', @RowCount = 0;
     EXEC usp_LogError @BatchID=@B, @StepLogID=@S, @ErrorSeverity='High', 
-         @ErrorSource='Load_STG_AnnualDecl', @ErrorMessage=N'Unexpected error';
+         @ErrorSource='Load_STG_AnnualDeclaration', @ErrorMessage=N'Unexpected error';
 END CATCH
 
 -- ═══ Step 3g: Load_STG_Officer (SUCCESS) ═══
@@ -572,8 +578,10 @@ EXEC usp_StartStep @BatchID = @B, @StepName = 'Load_STG_Officer', @StepID = @S O
 BEGIN TRY
     TRUNCATE TABLE DV_Staging.dbo.STG_Officer;
     INSERT INTO DV_Staging.dbo.STG_Officer 
-        (OfficerCode, OfficerName, Department, Position, IsActive, RecordSource, STG_LoadDate)
-    SELECT OfficerCode, OfficerName, Department, Position, IsActive, 'TaxSystemDB', GETDATE()
+        (OfficerID, OfficerCode, FirstName, LastName, Department, IsActive, 
+         CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
+    SELECT OfficerID, OfficerCode, FirstName, LastName, Department, IsActive, 
+           CreatedDate, UpdatedDate, SourceSystem, 'TaxSystemDB', GETDATE()
     FROM TaxSystemDB.dbo.Officer;
     SET @RC = @@ROWCOUNT;
     EXEC usp_EndStep @StepID = @S, @Status = 'Success', @RowCount = @RC;
@@ -590,9 +598,11 @@ EXEC usp_StartStep @BatchID = @B, @StepName = 'Load_STG_Owner', @StepID = @S OUT
 BEGIN TRY
     TRUNCATE TABLE DV_Staging.dbo.STG_Owner;
     INSERT INTO DV_Staging.dbo.STG_Owner 
-        (OwnerID, TaxpayerID, OwnerName, OwnerType, OwnershipPercentage, IsActive, RecordSource, STG_LoadDate)
-    SELECT OwnerID, TaxpayerID, OwnerName, OwnerType, OwnershipPercentage, IsActive, 'TaxSystemDB', GETDATE()
-    FROM TaxSystemDB.dbo.TaxpayerOwner;
+        (OwnerID, TaxpayerID, OwnerName, OwnerType, OwnershipPercentage, IsActive, 
+         CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
+    SELECT OwnerID, TaxpayerID, OwnerName, OwnerType, OwnershipPercentage, IsActive, 
+           CreatedDate, UpdatedDate, SourceSystem, 'TaxSystemDB', GETDATE()
+    FROM TaxSystemDB.dbo.Owner;
     SET @RC = @@ROWCOUNT;
     EXEC usp_EndStep @StepID = @S, @Status = 'Success', @RowCount = @RC;
     PRINT '   ✓ Load_STG_Owner: ' + CAST(@RC AS VARCHAR) + ' rows';
@@ -662,9 +672,11 @@ BEGIN TRY
     TRUNCATE TABLE DV_Staging.dbo.STG_Payment;
     INSERT INTO DV_Staging.dbo.STG_Payment 
         (PaymentID, TaxpayerID, DeclarationID, AnnualDeclarationID, PaymentAmount, 
-         PaymentDate, PaymentMethod, Status, RecordSource, STG_LoadDate)
+         PaymentDate, PaymentMethod, ReferenceNumber, Status, IsActive, 
+         CreatedDate, UpdatedDate, SourceSystem, RecordSource, LoadDateTime)
     SELECT PaymentID, TaxpayerID, DeclarationID, AnnualDeclarationID, PaymentAmount, 
-           PaymentDate, PaymentMethod, Status, 'TaxSystemDB', GETDATE()
+           PaymentDate, PaymentMethod, ReferenceNumber, Status, IsActive, 
+           CreatedDate, UpdatedDate, SourceSystem, 'TaxSystemDB', GETDATE()
     FROM TaxSystemDB.dbo.Payment;
     SET @RC = @@ROWCOUNT;
     EXEC usp_EndStep @StepID = @S, @Status = 'Success', @RowCount = @RC;
@@ -683,8 +695,8 @@ SELECT 'STG_Category' AS T, COUNT(*) AS Rows FROM DV_Staging.dbo.STG_Category
 UNION ALL SELECT 'STG_Structure', COUNT(*) FROM DV_Staging.dbo.STG_Structure
 UNION ALL SELECT 'STG_Taxpayer', COUNT(*) FROM DV_Staging.dbo.STG_Taxpayer
 UNION ALL SELECT 'STG_Payment', COUNT(*) FROM DV_Staging.dbo.STG_Payment
-UNION ALL SELECT 'STG_MonthlyDecl', COUNT(*) FROM DV_Staging.dbo.STG_MonthlyDecl
-UNION ALL SELECT 'STG_AnnualDecl', COUNT(*) FROM DV_Staging.dbo.STG_AnnualDecl
+UNION ALL SELECT 'STG_MonthlyDeclaration', COUNT(*) FROM DV_Staging.dbo.STG_MonthlyDeclaration
+UNION ALL SELECT 'STG_AnnualDeclaration', COUNT(*) FROM DV_Staging.dbo.STG_AnnualDeclaration
 UNION ALL SELECT 'STG_Officer', COUNT(*) FROM DV_Staging.dbo.STG_Officer
 UNION ALL SELECT 'STG_Owner', COUNT(*) FROM DV_Staging.dbo.STG_Owner;
 GO
@@ -790,8 +802,12 @@ EXEC dbo.usp_Load_DIM_Category @BatchID=@BatchID, @RowCount=@RC OUTPUT;
 PRINT '   DIM_Category: ' + CAST(@RC AS VARCHAR) + ' rows';
 EXEC dbo.usp_Load_DIM_Structure @BatchID=@BatchID, @RowCount=@RC OUTPUT;
 PRINT '   DIM_Structure: ' + CAST(@RC AS VARCHAR) + ' rows';
+EXEC dbo.usp_Load_DIM_Activity @BatchID=@BatchID, @RowCount=@RC OUTPUT;
+PRINT '   DIM_Activity: ' + CAST(@RC AS VARCHAR) + ' rows';
 EXEC dbo.usp_Load_DIM_Taxpayer @BatchID=@BatchID, @SnapshotDate=@SD, @RowCount=@RC OUTPUT;
 PRINT '   DIM_Taxpayer: ' + CAST(@RC AS VARCHAR) + ' rows';
+EXEC dbo.usp_Load_DIM_Officer @BatchID=@BatchID, @SnapshotDate=@SD, @RowCount=@RC OUTPUT;
+PRINT '   DIM_Officer: ' + CAST(@RC AS VARCHAR) + ' rows';
 EXEC dbo.usp_Load_DIM_Status @BatchID=@BatchID, @RowCount=@RC OUTPUT;
 PRINT '   DIM_Status: ' + CAST(@RC AS VARCHAR) + ' rows';
 EXEC dbo.usp_Load_DIM_PaymentMethod @BatchID=@BatchID, @RowCount=@RC OUTPUT;
@@ -802,10 +818,10 @@ EXEC dbo.usp_Load_FACT_MonthlyDeclaration @BatchID=@BatchID, @SnapshotDate=@SD, 
 PRINT '   FACT_MonthlyDeclaration: ' + CAST(@RC AS VARCHAR) + ' rows';
 EXEC dbo.usp_Load_FACT_Payment @BatchID=@BatchID, @SnapshotDate=@SD, @RowCount=@RC OUTPUT;
 PRINT '   FACT_Payment: ' + CAST(@RC AS VARCHAR) + ' rows';
-EXEC dbo.usp_Load_FACT_AnnualDeclaration @BatchID=@BatchID, @SnapshotDate=@SD, @RowCount=@RC OUTPUT;
-PRINT '   FACT_AnnualDeclaration: ' + CAST(@RC AS VARCHAR) + ' rows';
-EXEC dbo.usp_Load_FACT_Compliance @BatchID=@BatchID, @SnapshotDate=@SD, @RowCount=@RC OUTPUT;
-PRINT '   FACT_Compliance: ' + CAST(@RC AS VARCHAR) + ' rows';
+EXEC dbo.usp_Load_FACT_MonthlySnapshot @BatchID=@BatchID, @SnapshotDate=@SD, @RowCount=@RC OUTPUT;
+PRINT '   FACT_MonthlySnapshot: ' + CAST(@RC AS VARCHAR) + ' rows';
+EXEC dbo.usp_Load_FACT_DeclarationLifecycle @BatchID=@BatchID, @SnapshotDate=@SD, @RowCount=@RC OUTPUT;
+PRINT '   FACT_DeclarationLifecycle: ' + CAST(@RC AS VARCHAR) + ' rows';
 GO
 
 -- ─── Step 5: Query Gold Star Schema — BI Dashboard Ready ───

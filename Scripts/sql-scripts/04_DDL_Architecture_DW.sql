@@ -663,6 +663,7 @@ CREATE TABLE DIM_Category (
     CategoryDescription     VARCHAR(500)    NULL,
     IsActive                BIT             NULL,
     GLD_LoadDate            DATETIME        NOT NULL DEFAULT GETDATE(),
+    GLD_BatchID             INT             NOT NULL,
     CONSTRAINT PK_DIM_Category PRIMARY KEY (DIM_Category_SK),
     CONSTRAINT UK_DIM_Category_HK UNIQUE (HUB_Category_HK)
 );
@@ -676,6 +677,7 @@ CREATE TABLE DIM_Structure (
     StructureDescription    VARCHAR(500)    NULL,
     IsActive                BIT             NULL,
     GLD_LoadDate            DATETIME        NOT NULL DEFAULT GETDATE(),
+    GLD_BatchID             INT             NOT NULL,
     CONSTRAINT PK_DIM_Structure PRIMARY KEY (DIM_Structure_SK),
     CONSTRAINT UK_DIM_Structure_HK UNIQUE (HUB_Structure_HK)
 );
@@ -689,6 +691,7 @@ CREATE TABLE DIM_Activity (
     ActivityDescription     VARCHAR(500)    NULL,
     IsActive                BIT             NULL,
     GLD_LoadDate            DATETIME        NOT NULL DEFAULT GETDATE(),
+    GLD_BatchID             INT             NOT NULL,
     CONSTRAINT PK_DIM_Activity PRIMARY KEY (DIM_Activity_SK),
     CONSTRAINT UK_DIM_Activity_HK UNIQUE (HUB_Activity_HK)
 );
@@ -698,6 +701,7 @@ CREATE TABLE DIM_PaymentMethod (
     DIM_PaymentMethod_SK    INT IDENTITY(1,1) NOT NULL,
     PaymentMethod           VARCHAR(50)     NOT NULL,
     GLD_LoadDate            DATETIME        NOT NULL DEFAULT GETDATE(),
+    GLD_BatchID             INT             NOT NULL,
     CONSTRAINT PK_DIM_PaymentMethod PRIMARY KEY (DIM_PaymentMethod_SK),
     CONSTRAINT UK_DIM_PaymentMethod UNIQUE (PaymentMethod)
 );
@@ -707,6 +711,7 @@ CREATE TABLE DIM_Status (
     DIM_Status_SK           INT IDENTITY(1,1) NOT NULL,
     StatusCode              VARCHAR(50)     NOT NULL,
     GLD_LoadDate            DATETIME        NOT NULL DEFAULT GETDATE(),
+    GLD_BatchID             INT             NOT NULL,
     CONSTRAINT PK_DIM_Status PRIMARY KEY (DIM_Status_SK),
     CONSTRAINT UK_DIM_Status UNIQUE (StatusCode)
 );
@@ -736,7 +741,7 @@ CREATE TABLE FACT_MonthlyDeclaration (
 );
 
 CREATE TABLE FACT_Payment (
-    FACT_Payment_SK         INT IDENTITY(1,1) NULL,
+    FACT_Payment_SK         INT IDENTITY(1,1) NOT NULL,
     DIM_Taxpayer_SK         INT             NULL,
     DIM_PaymentMethod_SK    INT             NULL,
     DIM_Status_SK           INT             NULL,
