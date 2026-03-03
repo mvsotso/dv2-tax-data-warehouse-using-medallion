@@ -534,7 +534,7 @@ GO
 CREATE PROCEDURE usp_ExecuteWithRetry
     @BatchID INT,
     @StepName VARCHAR(100),
-    @SQLCommand VARCHAR(MAX),
+    @SQLCommand NVARCHAR(MAX),
     @MaxRetries INT = NULL
 AS
 BEGIN
@@ -545,6 +545,7 @@ BEGIN
         SET @MaxRetries = dbo.fn_GetConfigValueInt('RetryAttempts');
     
     DECLARE @RetryDelay INT = dbo.fn_GetConfigValueInt('RetryDelaySeconds');
+    DECLARE @RetryDelayStr VARCHAR(12) = '00:00:' + RIGHT('0' + CAST(@RetryDelay AS VARCHAR(2)), 2); -- FIX: WAITFOR DELAY requires 'HH:MM:SS' string
     DECLARE @RetryCount INT = 0;
     DECLARE @Success BIT = 0;
     DECLARE @ErrorMessage VARCHAR(MAX);
@@ -598,7 +599,7 @@ BEGIN
                 PRINT 'Waiting ' + CAST(@RetryDelay AS VARCHAR(10)) + ' seconds before retry...';
                 
                 -- Wait before retry
-                WAITFOR DELAY @RetryDelay;
+                WAITFOR DELAY @RetryDelayStr;
                 
                 SET @RetryCount = @RetryCount + 1;
             END

@@ -1,3 +1,0 @@
-ALTER TABLE DV_Gold.dbo.FACT_Payment DROP CONSTRAINT FK_FACT_Pay_Taxpayer; 
-ALTER TABLE DV_Gold.dbo.FACT_Payment ALTER COLUMN DIM_Taxpayer_SK INT NULL; 
-ALTER TABLE DV_Gold.dbo.FACT_Payment ADD CONSTRAINT FK_FACT_Pay_Taxpayer FOREIGN KEY (DIM_Taxpayer_SK) REFERENCES DV_Gold.dbo.DIM_Taxpayer(DIM_Taxpayer_SK);
