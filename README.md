@@ -126,7 +126,7 @@ dv2-tax-data-warehouse-using-medallion/
 │   │   ├── 00_CleanAll_FreshFullLoad.sql         # Reset all 6 databases for fresh start
 │   │   ├── 01_CreateDatabaseStructure.sql        # Source database (TaxSystemDB) DDL
 │   │   ├── 02_TransactionData.sql                # Simulated tax data (1,000 taxpayers)
-│   │   ├── 03_ETL_Control_Setup.sql              # ETL Control framework v3.2 (logging, watermarks)
+│   │   ├── 03_ETL_Control_Setup.sql              # ETL Control framework (logging, watermarks)
 │   │   └── 04_DDL_Architecture_DW.sql            # Data warehouse DDL (Staging/Bronze/Silver/Gold)
 │   │
 │   └── verification/                            # Testing and validation scripts
@@ -134,15 +134,8 @@ dv2-tax-data-warehouse-using-medallion/
 │       ├── 11_Verify_IncrementalLoad.sql         # Incremental load verification (8 checks)
 │       ├── 11_Verify_IncrementalLoad_Clean.sql   # Clean incremental verification for screenshots
 │       ├── 12_IncrementalTest_SourceChanges.sql  # Delta test data for incremental loads
-│       └── Screenshot_Source_DB_AllGrids.sql     # Source DB screenshot helper queries
-│
-├── Benchmarks/                                  # Performance benchmarking
-│   ├── Benchmark_Walkthrough.sql                 # Step-by-step benchmark execution guide
-│   ├── Metric Benchmarks Verification.sql        # Benchmark queries (ETL + query performance)
-│   ├── Metric Benchmarks Verification.docx       # Benchmark results with screenshots
-│   ├── Screenshot_Benchmarks_AllGrids.sql        # Benchmark screenshot helper queries
-│   ├── Source_Database_Verification.sql          # Source database validation (12-point checklist)
-│   └── Source_Database_Verification.docx         # Source DB verification results
+│       ├── Screenshot_Source_DB_AllGrids.sql     # Source DB screenshot helper queries
+│       └── Source_Database_Verification.sql      # Source database validation (12-point checklist)
 │
 ├── Proof Of Concepts/                           # POC demonstrations (Chapter 5)
 │   ├── 13_POC_Demonstrations.sql                 # All 4 POC challenge demonstrations
@@ -150,10 +143,10 @@ dv2-tax-data-warehouse-using-medallion/
 │
 ├── Documents/                                   # Thesis documents
 │   ├── Final_Report.docx                         # Complete thesis report (6 chapters, ~80 pages)
-│   ├── Final_Presentation.pptx                   # Defense presentation (15 slides)
+│   ├── Final_Presentation.pptx                   # Defense presentation (13 slides)
 │   ├── Technical_Implementation_Guide.docx       # SSIS package build guide (~150 pages)
 │   ├── Deployment_Operations_Guide.docx          # Google Cloud VM deployment & benchmarks
-│   ├── Thesis_Defense_Preparation.docx           # Q&A preparation (18 questions)
+│   ├── Source_Database_Verification.docx         # Source DB verification results (12-point checklist)
 │   └── Figure_3_1.pptx                           # Architecture diagram (editable)
 │
 ├── Figures/                                     # Chapter 5 POC screenshots
@@ -224,8 +217,8 @@ The ETL pipeline is executed through **SSIS packages** in Visual Studio:
 -- After Incremental Load
 -- Run: Scripts/verification/11_Verify_IncrementalLoad.sql
 
--- Performance Benchmarks
--- Run: Benchmarks/Metric Benchmarks Verification.sql
+-- Source Database Validation (12-point checklist)
+-- Run: Scripts/verification/Source_Database_Verification.sql
 
 -- POC Demonstrations (Chapter 5)
 -- Run: Proof Of Concepts/13_POC_Demonstrations.sql
@@ -240,7 +233,7 @@ The ETL pipeline is executed through **SSIS packages** in Visual Studio:
 | Database | Purpose | Key Objects |
 |----------|---------|-------------|
 | **TaxSystemDB** | Source system (simulated) | 9 tables (3 lookup + 3 reference + 3 transaction) |
-| **ETL_Control** | Pipeline orchestration | BatchLog, StepLog, ErrorLog, Watermark, Configuration |
+| **ETL_Control** | Pipeline orchestration | ETL_Process, BatchLog, StepLog, ErrorLog, Watermark |
 | **DV_Staging** | Landing zone | 9 staging tables (truncate & reload / watermark delta) |
 | **DV_Bronze** | Raw Data Vault | 9 Hubs, 9 Satellites, 5 Links |
 | **DV_Silver** | Business Vault | 3 PIT tables, 1 Bridge, 2 Business Vault tables |
@@ -256,11 +249,11 @@ The ETL pipeline is executed through **SSIS packages** in Visual Studio:
 
 ### ETL Control Framework
 
+- **Process registry**: ETL_Process table maps each pipeline step to its source and target
 - **Batch-level logging**: Every ETL run tracked with BatchID, status, record counts
 - **Step-level logging**: Each of 49 steps individually tracked
 - **Watermark-based incremental**: Per-table watermarks for delta extraction
 - **Error handling**: Centralized error logging with severity classification (SSIS OnError Event Handler)
-- **Configuration table**: Runtime-configurable parameters (retry attempts, thresholds)
 
 ### SSIS Package Hierarchy (60 Packages)
 
@@ -312,12 +305,11 @@ Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 | Document | Description |
 |----------|-------------|
 | [Final Report](Documents/Final_Report.docx) | Complete 6-chapter thesis (~80 pages) |
-| [Final Presentation](Documents/Final_Presentation.pptx) | 15-slide defense presentation with speaker notes |
+| [Final Presentation](Documents/Final_Presentation.pptx) | 13-slide defense presentation with speaker notes |
 | [Technical Implementation Guide](Documents/Technical_Implementation_Guide.docx) | Step-by-step SSIS package build guide (~150 pages) |
-| [Deployment Guide](Documents/Deployment_Operations_Guide.docx) | Google Cloud Platform VM deployment |
-| [Defense Preparation](Documents/Thesis_Defense_Preparation.docx) | 18 potential Q&A for thesis defense |
+| [Deployment Guide](Documents/Deployment_Operations_Guide.docx) | Google Cloud Platform VM deployment & benchmarks |
+| [Source Database Verification](Documents/Source_Database_Verification.docx) | 12-point source DB validation with screenshots |
 | [POC Implementation Guide](Proof%20Of%20Concepts/POC_Implementation_Guide.docx) | Step-by-step guide for 4 POC demonstrations |
-| [Benchmark Verification](Benchmarks/Metric%20Benchmarks%20Verification.docx) | Key metric benchmark results with screenshots |
 
 ---
 
