@@ -43,24 +43,6 @@ This repository contains the full implementation of a proof-of-concept data ware
 | 3 | Scalable ETL with Error Handling | BatchLog + StepLog + SSIS OnError Event Handlers — step-level visibility with selective recovery |
 | 4 | Business Rules Gap | Silver (Business Vault) + Gold (Star Schema) — pre-computed compliance scores, trends, risk levels |
 
-### Challenges Addressed
-
-| # | Challenge | Data Vault 2.0 Solution |
-|---|-----------|------------------------|
-| 1 | Schema Rigidity | Hub-Satellite separation — add new Satellites without modifying existing objects |
-| 2 | Historical Tracking | Insert-only Satellites with HashDiff — all versions preserved with timestamps |
-| 3 | Scalable ETL | BatchLog + StepLog + OnError Event Handlers — step-level visibility with selective recovery |
-| 4 | Business Rules Gap | Silver (Business Vault) + Gold (Star Schema) — pre-computed scores, trends, risk levels |
-
-### Challenges Addressed
-
-| # | Challenge | Data Vault 2.0 Solution |
-|---|-----------|------------------------|
-| 1 | Schema Rigidity | Hub-Satellite separation — add new Satellites without modifying existing objects |
-| 2 | Historical Data Loss | Insert-only Satellites with HashDiff change detection — all versions preserved with timestamps |
-| 3 | Scalable ETL with Error Handling | BatchLog + StepLog + SSIS OnError Event Handlers — step-level visibility with selective recovery |
-| 4 | Business Rules Gap | Silver (Business Vault) + Gold (Star Schema) — pre-computed compliance scores, trends, risk levels |
-
 ---
 
 ## 📁 Repository Structure
