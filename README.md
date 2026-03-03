@@ -29,11 +29,37 @@ This repository contains the full implementation of a proof-of-concept data ware
 
 | Metric | Value |
 |--------|-------|
-| Full Load | 336,677 records in 120.9s (2,785 rec/s) |
-| Incremental Load | 206,780 records in 93.6s (2,209 rec/s) |
-| Query Speedup (Gold vs Raw Vault) | 1.03× – 8.3× |
+| Source Tables | 9 (3 lookup + 3 reference + 3 transaction) |
 | Total Database Objects | 67 across 6 databases |
 | SSIS Packages | 60 total (3 master + 8 orchestrator + 49 child) |
+| Simulated Taxpayers | 1,000 |
+
+### Challenges Addressed
+
+| # | Challenge | Data Vault 2.0 Solution |
+|---|-----------|------------------------|
+| 1 | Schema Rigidity | Hub-Satellite separation — add new Satellites without modifying existing objects |
+| 2 | Historical Data Loss | Insert-only Satellites with HashDiff — all versions preserved with timestamps |
+| 3 | Scalable ETL with Error Handling | BatchLog + StepLog + SSIS OnError Event Handlers — step-level visibility with selective recovery |
+| 4 | Business Rules Gap | Silver (Business Vault) + Gold (Star Schema) — pre-computed compliance scores, trends, risk levels |
+
+### Challenges Addressed
+
+| # | Challenge | Data Vault 2.0 Solution |
+|---|-----------|------------------------|
+| 1 | Schema Rigidity | Hub-Satellite separation — add new Satellites without modifying existing objects |
+| 2 | Historical Tracking | Insert-only Satellites with HashDiff — all versions preserved with timestamps |
+| 3 | Scalable ETL | BatchLog + StepLog + OnError Event Handlers — step-level visibility with selective recovery |
+| 4 | Business Rules Gap | Silver (Business Vault) + Gold (Star Schema) — pre-computed scores, trends, risk levels |
+
+### Challenges Addressed
+
+| # | Challenge | Data Vault 2.0 Solution |
+|---|-----------|------------------------|
+| 1 | Schema Rigidity | Hub-Satellite separation — add new Satellites without modifying existing objects |
+| 2 | Historical Data Loss | Insert-only Satellites with HashDiff change detection — all versions preserved with timestamps |
+| 3 | Scalable ETL with Error Handling | BatchLog + StepLog + SSIS OnError Event Handlers — step-level visibility with selective recovery |
+| 4 | Business Rules Gap | Silver (Business Vault) + Gold (Star Schema) — pre-computed compliance scores, trends, risk levels |
 
 ---
 
@@ -129,23 +155,21 @@ dv2-tax-data-warehouse-using-medallion/
 │   │   ├── 03_ETL_Control_Setup.sql              # ETL Control framework (logging, watermarks)
 │   │   └── 04_DDL_Architecture_DW.sql            # Data warehouse DDL (Staging/Bronze/Silver/Gold)
 │   │
-│   └── verification/                            # Testing and validation scripts
+│   └── verification/                            # Testing, validation, and POC scripts
 │       ├── 10_Verify_FullLoad.sql                # Full load verification (7 checks)
 │       ├── 11_Verify_IncrementalLoad.sql         # Incremental load verification (8 checks)
 │       ├── 11_Verify_IncrementalLoad_Clean.sql   # Clean incremental verification for screenshots
 │       ├── 12_IncrementalTest_SourceChanges.sql  # Delta test data for incremental loads
+│       ├── 13_POC_Demonstrations.sql             # All 4 POC challenge demonstrations (Chapter 5)
 │       ├── Screenshot_Source_DB_AllGrids.sql     # Source DB screenshot helper queries
 │       └── Source_Database_Verification.sql      # Source database validation (12-point checklist)
-│
-├── Proof Of Concepts/                           # POC demonstrations (Chapter 5)
-│   ├── 13_POC_Demonstrations.sql                 # All 4 POC challenge demonstrations
-│   └── POC_Implementation_Guide.docx             # Step-by-step POC guide
 │
 ├── Documents/                                   # Thesis documents
 │   ├── Final_Report.docx                         # Complete thesis report (6 chapters, ~80 pages)
 │   ├── Final_Presentation.pptx                   # Defense presentation (13 slides)
 │   ├── Technical_Implementation_Guide.docx       # SSIS package build guide (~150 pages)
 │   ├── Deployment_Operations_Guide.docx          # Google Cloud VM deployment & benchmarks
+│   ├── POC_Implementation_Guide.docx             # Step-by-step guide for 4 POC demonstrations
 │   ├── Source_Database_Verification.docx         # Source DB verification results (12-point checklist)
 │   └── Figure_3_1.pptx                           # Architecture diagram (editable)
 │
@@ -221,7 +245,7 @@ The ETL pipeline is executed through **SSIS packages** in Visual Studio:
 -- Run: Scripts/verification/Source_Database_Verification.sql
 
 -- POC Demonstrations (Chapter 5)
--- Run: Proof Of Concepts/13_POC_Demonstrations.sql
+-- Run: Scripts/verification/13_POC_Demonstrations.sql
 ```
 
 ---
@@ -276,30 +300,6 @@ Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 
 ---
 
-## 📊 Performance Benchmarks
-
-### ETL Load Performance
-
-| Metric | Full Load | Incremental Load |
-|--------|-----------|------------------|
-| **Total Records** | 336,677 | 206,780 |
-| **Total Duration** | 120.9s | 93.6s |
-| **Throughput** | 2,785 rec/s | 2,209 rec/s |
-| Staging Layer | 22.8s (58,813 records) | 6.0s (58,824 records) |
-| Bronze Layer | 39.5s (184,108 records) | 30.3s (50 records) |
-| Silver Layer | 3.4s (2,004 records) | 3.5s (57,186 records) |
-| Gold Layer | 11.0s (91,752 records) | 12.7s (90,729 records) |
-
-### Query Performance (Gold Star Schema vs Raw Vault)
-
-| Query Complexity | Query Description | Gold (ms) | Raw Vault (ms) | Speedup |
-|-----------------|-------------------|-----------|----------------|---------|
-| Simple | Total tax by category (2-table join) | 24 | 199 | **8.3×** |
-| Medium | Top 10 taxpayers by payment (4-table join) | 18 | 123 | **6.8×** |
-| Complex | Monthly revenue trend with category and status (4-table join) | 771 | 798 | **1.03×** |
-
----
-
 ## 📚 Documentation
 
 | Document | Description |
@@ -308,8 +308,8 @@ Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 | [Final Presentation](Documents/Final_Presentation.pptx) | 13-slide defense presentation with speaker notes |
 | [Technical Implementation Guide](Documents/Technical_Implementation_Guide.docx) | Step-by-step SSIS package build guide (~150 pages) |
 | [Deployment Guide](Documents/Deployment_Operations_Guide.docx) | Google Cloud Platform VM deployment & benchmarks |
+| [POC Implementation Guide](Documents/POC_Implementation_Guide.docx) | Step-by-step guide for 4 POC demonstrations |
 | [Source Database Verification](Documents/Source_Database_Verification.docx) | 12-point source DB validation with screenshots |
-| [POC Implementation Guide](Proof%20Of%20Concepts/POC_Implementation_Guide.docx) | Step-by-step guide for 4 POC demonstrations |
 
 ---
 
