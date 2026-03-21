@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PRIMARY SEO META TAGS -->
+    <title>Data Vault 2.0 Implementation with Medallion Architecture | DV2 Data Warehouse on SQL Server</title>
+    <meta name="description" content="Complete end-to-end Data Vault 2.0 (DV2) data warehouse implementation using Medallion Architecture (Staging, Bronze, Silver, Gold) on SQL Server 2025 with SSIS. 67 objects, 60 SSIS packages, 49 ETL steps. Open-source implementation with watermark-based incremental loading, hub-satellite-link modeling, and star schema.">
+    <meta name="keywords" content="Data Vault 2.0, DV2, Medallion Architecture, Data Warehouse, Star Schema, Hub Satellite Link, SSIS, SQL Server, ETL Pipeline, Watermark, Incremental Loading, Bronze Silver Gold, Business Vault, Raw Vault, Data Vault Implementation, DV2 Implementation, Data Engineering, Cambodia Tax System">
+    <meta name="author" content="Sot So">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://mvsotso.github.io/dv2-tax-data-warehouse-using-medallion/">
+
+    <!-- OPEN GRAPH (Facebook, LinkedIn) -->
+    <meta property="og:title" content="Data Vault 2.0 + Medallion Architecture Implementation | Complete DV2 Data Warehouse">
+    <meta property="og:description" content="First published end-to-end Data Vault 2.0 implementation with Medallion Architecture for government tax systems. 67 database objects, 60 SSIS packages, fully reproducible on SQL Server.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mvsotso.github.io/dv2-tax-data-warehouse-using-medallion/">
+
+    <!-- TWITTER CARD -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Data Vault 2.0 + Medallion Architecture | Complete DV2 Implementation">
+    <meta name="twitter:description" content="Open-source Data Vault 2.0 data warehouse with Medallion Architecture on SQL Server. 67 objects, 60 SSIS packages, watermark ETL, hub-satellite-link modeling.">
+
+    <!-- STRUCTURED DATA (Schema.org) - Helps Google understand the content -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "Data Vault 2.0 Implementation with Medallion Architecture",
+        "description": "Complete end-to-end Data Vault 2.0 (DV2) data warehouse implementation using Medallion Architecture (Staging, Bronze, Silver, Gold) on Microsoft SQL Server 2025 with SSIS. Features 67 database objects, 60 SSIS packages, 49 automated ETL steps, watermark-based incremental loading, and hub-satellite-link modeling.",
+        "codeRepository": "https://github.com/mvsotso/dv2-tax-data-warehouse-using-medallion",
+        "programmingLanguage": ["T-SQL", "SSIS"],
+        "runtimePlatform": "Microsoft SQL Server 2025",
+        "author": {
+            "@type": "Person",
+            "name": "Sot So",
+            "affiliation": {
+                "@type": "EducationalOrganization",
+                "name": "Royal University of Phnom Penh"
+            }
+        },
+        "license": "https://opensource.org/licenses/MIT",
+        "keywords": "Data Vault 2.0, DV2, Medallion Architecture, Data Warehouse, Star Schema, Hub Satellite Link, SSIS, SQL Server, ETL, Watermark, Incremental Loading, Bronze Silver Gold",
+        "dateCreated": "2026-03-01",
+        "educationalLevel": "Master's Thesis"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ScholarlyArticle",
+        "name": "Data Vault 2.0 Implementation for Cambodia Tax System Data Warehouse Using Medallion Architecture",
+        "author": {"@type": "Person", "name": "Sot So"},
+        "datePublished": "2026-03",
+        "publisher": {"@type": "EducationalOrganization", "name": "Royal University of Phnom Penh"},
+        "about": ["Data Vault 2.0", "Medallion Architecture", "Data Warehouse", "ETL Pipeline", "SQL Server", "SSIS"],
+        "keywords": "Data Vault 2.0, DV2, Medallion Architecture, Data Warehouse, Watermark, Hub Satellite Link, Star Schema, ETL"
+    }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1E293B; line-height: 1.6; background: #F7FAFA; }
+        .hero { background: linear-gradient(135deg, #1B3A5C 0%, #0D2B45 100%); color: white; padding: 60px 20px; text-align: center; }
+        .hero h1 { font-size: 2.2em; margin-bottom: 16px; font-family: Georgia, serif; }
+        .hero h1 span { color: #2A9D8F; }
+        .hero p { font-size: 1.15em; max-width: 800px; margin: 0 auto 24px; color: #94A3B8; }
+        .hero .stats { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 32px; }
+        .hero .stat { text-align: center; }
+        .hero .stat .num { font-size: 2em; font-weight: bold; color: #2A9D8F; }
+        .hero .stat .label { font-size: 0.85em; color: #94A3B8; }
+        .btn { display: inline-block; padding: 12px 28px; background: #2A9D8F; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 8px; transition: background 0.2s; }
+        .btn:hover { background: #238b7e; }
+        .btn.secondary { background: transparent; border: 2px solid #2A9D8F; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        h2 { font-size: 1.6em; color: #1B3A5C; margin-bottom: 20px; font-family: Georgia, serif; }
+        h2 span { color: #2A9D8F; }
+        .arch { background: white; border-radius: 8px; padding: 24px; margin: 20px 0; border-left: 4px solid #2A9D8F; }
+        .arch pre { font-family: 'Consolas', monospace; font-size: 0.85em; overflow-x: auto; color: #334155; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 20px 0; }
+        .card { background: white; border-radius: 8px; padding: 20px; border-top: 3px solid #2A9D8F; }
+        .card h3 { color: #1B3A5C; margin-bottom: 8px; }
+        .card .result { color: #2A9D8F; font-weight: bold; font-size: 0.95em; }
+        .keywords { background: #E8F4F2; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .keywords p { font-size: 0.9em; color: #64748B; }
+        footer { background: #1B3A5C; color: #94A3B8; text-align: center; padding: 30px 20px; }
+        footer a { color: #2A9D8F; }
+        @media (max-width: 600px) { .hero h1 { font-size: 1.5em; } .hero .stats { gap: 16px; } }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1><span>Data Vault 2.0</span> Implementation<br>with <span>Medallion Architecture</span></h1>
+    <p>The first complete, open-source, end-to-end <strong>DV2 + Medallion data warehouse</strong> implementation on SQL Server with SSIS. Built for Cambodia's tax administration system.</p>
+    <div>
+        <a href="https://github.com/mvsotso/dv2-tax-data-warehouse-using-medallion" class="btn">View on GitHub</a>
+        <a href="https://github.com/mvsotso/dv2-tax-data-warehouse-using-medallion/tree/main/Documents" class="btn secondary">Read Documentation</a>
+    </div>
+    <div class="stats">
+        <div class="stat"><div class="num">67</div><div class="label">Database Objects</div></div>
+        <div class="stat"><div class="num">60</div><div class="label">SSIS Packages</div></div>
+        <div class="stat"><div class="num">49</div><div class="label">ETL Steps</div></div>
+        <div class="stat"><div class="num">6</div><div class="label">Databases</div></div>
+        <div class="stat"><div class="num">58,813</div><div class="label">Source Records</div></div>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Four-Layer <span>Medallion Architecture</span> with <span>Data Vault 2.0</span></h2>
+    <div class="arch">
+        <pre>
+Source (OLTP)       Staging          Bronze (Raw Vault)       Silver (Business Vault)   Gold (Star Schema)
+TaxSystemDB    -->  DV_Staging  -->  DV_Bronze            --> DV_Silver            -->  DV_Gold
+9 tables            9 tables         9 Hubs (SHA-256)         3 PIT Tables              7 Dimensions (SCD2)
+58,813 rows         Watermark        9 Satellites (SCD2)      1 Bridge Table            4 Fact Tables
+                    Delta ETL        5 Links                  2 Business Tables         BI-Ready Star Schema
+        </pre>
+    </div>
+
+    <h2>Proof-of-Concept: <span>4 Challenges Addressed</span></h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Schema Rigidity</h3>
+            <p>Add new Satellite without modifying existing objects.</p>
+            <p class="result">0/67 objects changed, 0/60 packages modified</p>
+        </div>
+        <div class="card">
+            <h3>Historical Tracking</h3>
+            <p>Insert-only Satellites with HashDiff change detection.</p>
+            <p class="result">All 3 versions preserved with timestamps</p>
+        </div>
+        <div class="card">
+            <h3>Scalable ETL</h3>
+            <p>Step-level error recovery with BatchLog/StepLog.</p>
+            <p class="result">7/8 steps recovered, 45,065 rows processed</p>
+        </div>
+        <div class="card">
+            <h3>Business Rules</h3>
+            <p>Silver Business Vault separates raw from derived.</p>
+            <p class="result">Compliance score 72.5%, Risk: MEDIUM</p>
+        </div>
+    </div>
+
+    <h2>Technology Stack</h2>
+    <p>SQL Server 2025 Developer Edition, SSIS 2022, Visual Studio 2026, T-SQL, SQL Server Agent. All tools are <strong>free or included</strong> with SQL Server.</p>
+
+    <h2>Performance</h2>
+    <p>Full load: <strong>91.6 seconds</strong> (49 steps). Gold star schema queries run <strong>2.4x to 11.4x faster</strong> than raw Data Vault queries.</p>
+
+    <div class="keywords">
+        <h2>Keywords</h2>
+        <p>Data Vault 2.0, DV2, Data Vault Implementation, Medallion Architecture, Data Warehouse, Star Schema, Hub Satellite Link, SSIS, SQL Server, ETL Pipeline, Watermark Incremental Loading, Bronze Silver Gold, Business Vault, Raw Vault, Information Vault, SCD Type 2, HashDiff, Change Detection, Audit Trail, Insert-Only Loading, Data Engineering, Government Data Warehouse, Cambodia Tax System, DV2 Medallion, Data Vault SQL Server, SSIS Data Vault, Medallion Data Warehouse, DV2 Implementation, Data Vault 2.0 Tutorial, Data Vault 2.0 Example</p>
+    </div>
+</div>
+
+<footer>
+    <p><strong>Data Vault 2.0 + Medallion Architecture Implementation</strong></p>
+    <p>Master's Thesis by Sot So | Royal University of Phnom Penh | 2026</p>
+    <p><a href="https://github.com/mvsotso/dv2-tax-data-warehouse-using-medallion">GitHub Repository</a> | MIT License</p>
+</footer>
+
+</body>
+</html>
