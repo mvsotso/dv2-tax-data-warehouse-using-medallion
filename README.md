@@ -150,14 +150,14 @@ dv2-tax-data-warehouse-using-medallion/
 │       ├── 13_POC_Demonstrations.sql            #   All 4 POC demonstrations (Chapter 5)
 │       └── Source_Database_Verification.sql     #   12-point source database validation
 │
-├── Documents/                                  # Thesis documents
-│   ├── Final_Report.docx                        #   Complete thesis (6 chapters)
-│   ├── Final_Presentation.pptx                  #   Defense presentation (13 slides)
-│   ├── Technical_Implementation_Guide.docx      #   SSIS package build guide
-│   ├── Deployment_Operations_Guide.docx         #   Google Cloud VM deployment guide
-│   ├── POC_Implementation_Guide.docx            #   Step-by-step POC demonstration guide
-│   ├── Source_Database_Verification.docx        #   Source DB verification (12-point checklist)
-│   └── Figure_3_1.pptx                          #   Architecture diagram (editable source)
+├── Documents/                                  # Thesis documents (PDF format)
+│   ├── Final_Report.pdf                         #   Complete thesis (6 chapters)
+│   ├── Final_Presentation.pdf                   #   Defense presentation (13 slides)
+│   ├── Technical_Implementation_Guide.pdf       #   SSIS package build guide
+│   ├── Deployment_Operations_Guide.pdf          #   Google Cloud VM deployment + performance benchmarks
+│   ├── POC_Implementation_Guide.pdf             #   Step-by-step POC demonstration guide
+│   ├── Source_Database_Verification.pdf         #   Source DB verification (12-point checklist)
+│   └── BigData_5V.pdf                           #   Big Data 5V reference diagram
 │
 ├── Figures/                                    # Chapter 5 POC evidence screenshots
 │   ├── Figure_5.1_Schema_Flexibility.png        #   Challenge 1: Zero-impact schema evolution
@@ -295,16 +295,64 @@ Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 
 ---
 
+## Cloud Deployment
+
+The project is deployed on a **Google Cloud Platform** VM for consistent, reproducible benchmark results. See the [Deployment & Operations Guide](Documents/Deployment_Operations_Guide.pdf) for step-by-step instructions.
+
+### VM Specification
+
+| Component | Specification |
+|-----------|--------------|
+| VM Name | dv2-tax-system |
+| Machine Type | e2-standard-4 (4 vCPUs, 2 cores, 16 GB RAM) |
+| Region / Zone | asia-southeast1-a (Singapore) |
+| OS | Windows Server 2025 Datacenter |
+| Storage | 128 GB SSD persistent disk |
+| Cost | ~$0.38/hour (covered by Google Cloud Free Trial $300 credit) |
+
+### Deployment Phases
+
+- **Phase A** (Sections 1-7): VM creation, SQL Server + SSMS + Visual Studio installation, database deployment, SSIS project setup, advisor access configuration
+- **Phase B** (Sections 8-13): Performance benchmarks, full/incremental load testing, query performance comparison, scalability analysis
+
+> **Cost tip**: Always stop the VM from Google Cloud Console when not in use. For benchmark usage (~3-5 hours total), actual cost is only $1-2.
+
+---
+
+## Performance Benchmarks
+
+All benchmarks were captured on the Google Cloud VM for reproducibility. Full details in the [Deployment & Operations Guide](Documents/Deployment_Operations_Guide.pdf), Phase B.
+
+### ETL Pipeline Execution Time (Table 5.1)
+
+| Layer | Objects | Full Load (sec) | Incremental (sec) | Records (Full / Incr) |
+|-------|---------|-----------------|--------------------|-----------------------|
+| Staging | 9 | 10.6 | 23.8 | 58,800 / 58,813 |
+| Bronze | 23 | 43.3 | 39.4 | 184,068 / 50 |
+| Silver | 6 | 6.3 | 6.2 | 2,000 / 57,174 |
+| Gold | 11 | 27.1 | 24.5 | 91,738 / 90,721 |
+| **TOTAL** | **49** | **91.6** | **97.7** | **336,606 / 206,758** |
+
+### Query Performance: Gold Star Schema vs Raw Vault (Table 5.2)
+
+| Complexity | Query Description | Gold (ms) | Raw Vault (ms) | Joins | Speedup |
+|------------|-------------------|-----------|----------------|-------|---------|
+| Simple | Tax by Category | 11.5 | 130.6 | 2 vs 7 | 11.4x |
+| Medium | Top Taxpayers by Payment | 31.3 | 80.5 | 4 vs 8 | 2.6x |
+| Complex | Monthly Revenue Trend | 64.6 | 151.9 | 6 vs 10 | 2.4x |
+
+---
+
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
-| [Final Report](Documents/Final_Report.docx) | Complete 6-chapter thesis |
-| [Final Presentation](Documents/Final_Presentation.pptx) | 13-slide defense presentation with speaker notes |
-| [Technical Implementation Guide](Documents/Technical_Implementation_Guide.docx) | Step-by-step SSIS package build and configuration guide |
-| [Deployment Guide](Documents/Deployment_Operations_Guide.docx) | Google Cloud Platform VM deployment instructions |
-| [POC Implementation Guide](Documents/POC_Implementation_Guide.docx) | Reproducible SQL scripts for 4 POC demonstrations |
-| [Source Database Verification](Documents/Source_Database_Verification.docx) | 12-point source database validation with SSMS screenshots |
+| [Final Report](Documents/Final_Report.pdf) | Complete 6-chapter thesis |
+| [Final Presentation](Documents/Final_Presentation.pdf) | Defense presentation with speaker notes |
+| [Technical Implementation Guide](Documents/Technical_Implementation_Guide.pdf) | Step-by-step SSIS package build and configuration guide |
+| [Deployment & Operations Guide](Documents/Deployment_Operations_Guide.pdf) | Google Cloud VM deployment (Phase A) + performance benchmarks (Phase B) |
+| [POC Implementation Guide](Documents/POC_Implementation_Guide.pdf) | Reproducible SQL scripts for 4 POC demonstrations |
+| [Source Database Verification](Documents/Source_Database_Verification.pdf) | 12-point source database validation with SSMS screenshots |
 
 ---
 
@@ -315,11 +363,14 @@ Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
 | Database Engine | SQL Server 2025 Developer Edition (RTM v17.0.1000.7) |
 | ETL Tool | SQL Server Integration Services (SSIS) 2022 |
 | IDE | Visual Studio 2026 Community + SSIS Extension |
-| Deployment | Google Cloud Platform e2-standard-4 VM (4 vCPU, 16 GB RAM) |
+| Management | SQL Server Management Studio (SSMS) |
+| Deployment | Google Cloud Platform e2-standard-4 VM (4 vCPU, 16 GB RAM, 128 GB SSD) |
+| Region | asia-southeast1-a (Singapore) |
 | OS | Windows Server 2025 Datacenter |
 | Methodology | Data Vault 2.0 (Linstedt & Olschimke, 2015) |
 | Architecture | Medallion (Staging → Bronze → Silver → Gold) |
 | Hash Algorithm | SHA-256 via HASHBYTES('SHA2_256'), stored as VARBINARY(32) |
+| SQL Server Memory | 12 GB (of 16 GB) — configured via `sp_configure 'max server memory'` |
 
 ---
 
