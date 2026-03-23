@@ -27,3 +27,6 @@ obj/
 .idea/
 *.swp
 *.swo
+
+# Local config
+.claude/
