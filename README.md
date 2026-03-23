@@ -1,409 +1,270 @@
-# Data Vault 2.0 Tax System Data Warehouse Using Medallion Architecture
+# Data Vault 2.0 Implementation for Tax System Data Warehouse Using Medallion Architecture
 
-[![SQL Server](https://img.shields.io/badge/SQL%20Server-2025-CC2927?logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
-[![SSIS](https://img.shields.io/badge/SSIS-2022-5C2D91?logo=visualstudio&logoColor=white)](https://learn.microsoft.com/en-us/sql/integration-services/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![SQL Server 2025](https://img.shields.io/badge/SQL%20Server-2025-red.svg)](https://www.microsoft.com/sql-server)
+[![SSIS](https://img.shields.io/badge/SSIS-2022-orange.svg)](https://learn.microsoft.com/sql/integration-services)
+[![Data Vault 2.0](https://img.shields.io/badge/Data%20Vault-2.0-green.svg)](https://datavaultalliance.com)
+[![Medallion Architecture](https://img.shields.io/badge/Medallion-Architecture-teal.svg)](https://learn.microsoft.com/azure/databricks/lakehouse/medallion)
 
-> **Master's Thesis** — A complete Data Vault 2.0 data warehouse with medallion architecture (Staging → Bronze → Silver → Gold) for Cambodia's tax administration system, built on SQL Server 2025 and SSIS 2022.
+This is the implementation part of my master's thesis at Royal University of Phnom Penh. It builds a working data warehouse for Cambodia's tax administration system using Data Vault 2.0 combined with the Medallion Architecture pattern (Staging → Bronze → Silver → Gold) on SQL Server 2025 with SSIS.
 
-**Author:** Mr. Sot So — Master of Science in Data Science and Engineering, Royal University of Phnom Penh (February 2026)
-**Supervisor:** Mr. Chap Chanpiseth
-
----
-
-## Overview
-
-This repository contains the full implementation of a proof-of-concept data warehouse for the **General Department of Taxation (GDT), Cambodia**, using **Data Vault 2.0** methodology organized within a **four-layer medallion architecture**. The project demonstrates how modern data warehousing patterns address key challenges in government tax administration: schema rigidity, incomplete historical tracking, fragile ETL pipelines, and the gap between raw data and business-ready analytics.
-
-### Architecture
-
-```
-┌─────────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   TaxSystemDB   │────▶│  DV_Staging   │────▶│  DV_Bronze   │────▶│  DV_Silver   │────▶│   DV_Gold    │
-│   (Source)      │     │  (Landing)    │     │  (Raw Vault) │     │  (Business   │     │  (Star       │
-│                 │     │              │     │  Hub/Sat/Link │     │   Vault)     │     │   Schema)    │
-│  9 Tables       │     │  9 STG Tables │     │  9H / 9S / 5L│     │  3 PIT / 1 BRG│    │  7 DIM / 4 FCT│
-│  58,813 Records │     │              │     │              │     │  2 BUS       │     │              │
-└─────────────────┘     └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
-                         ◄─────────── ETL_Control (Batch/Step Logging, Watermarks, Error Handling) ──────────►
-```
-
-### Key Numbers
-
-| Metric | Value |
-|--------|-------|
-| Total Database Objects | 67 across 6 databases |
-| SSIS Packages | 60 (3 master + 8 orchestrator + 49 child) |
-| ETL Steps | 49 per pipeline run |
-| Source Tables | 9 (3 lookup + 3 reference + 3 transaction) |
-| Source Records | 58,813 (1,000 taxpayers, 4 years: 2020–2023) |
-| Hash Algorithm | SHA-256 via HASHBYTES('SHA2_256'), stored as VARBINARY(32) |
-
-### Challenges Addressed
-
-| # | Challenge | Data Vault 2.0 Solution | POC Evidence |
-|---|-----------|------------------------|--------------|
-| 1 | **Schema Rigidity** | Hub-Satellite separation — add new Satellites without modifying existing objects | Zero impact on all 60 SSIS packages |
-| 2 | **Historical Data Loss** | Insert-only Satellites with HashDiff — every version preserved with timestamps | Complete audit trail across all entities |
-| 3 | **Scalable ETL** | BatchLog + StepLog + SSIS OnError Event Handlers — step-level error isolation | Failed steps recoverable without re-running pipeline |
-| 4 | **Business Rules Gap** | Silver (Business Vault) + Gold (Star Schema) — derived compliance scores, risk levels | Pre-computed metrics for BI consumption |
+The goal was to address four common challenges in traditional data warehousing — schema rigidity, lack of historical tracking, fragile ETL pipelines, and mixed raw/derived data — by applying DV2 principles in a real-world tax domain.
 
 ---
 
-## Repository Structure
+## What's in this repo
+
+- 67 database objects across 6 databases
+- 60 SSIS packages (3 Master + 8 Orchestrator + 49 Child)
+- 49 automated ETL pipeline steps
+- Sample data: 58,813 records covering 1,000 taxpayers from 2020–2023
+- Bronze layer: 9 Hubs, 9 Satellites, 5 Links (SHA-256 hash keys)
+- Gold layer: 7 Dimensions (SCD Type 1 & 2), 4 Fact tables
+
+---
+
+## Architecture
+
+The pipeline moves data through four layers:
+
+```
+Source (OLTP)          Staging           Bronze (Raw Vault)      Silver (Business Vault)    Gold (Star Schema)
++--------------+    +-----------+    +--------------------+    +--------------------+    +-----------------+
+| TaxSystemDB  | -> | DV_Staging| -> | DV_Bronze          | -> | DV_Silver          | -> | DV_Gold         |
+| 9 tables     |    | 9 tables  |    | 9 Hubs (SHA-256)   |    | 3 PIT Tables       |    | 7 Dimensions    |
+| 58,813 rows  |    | Full/Incr |    | 9 Satellites (SCD2)|    | 1 Bridge Table     |    | 4 Fact Tables   |
+|              |    | Watermark |    | 5 Links            |    | 2 Business Tables  |    | BI-Ready Schema |
++--------------+    +-----------+    +--------------------+    +--------------------+    +-----------------+
+```
+
+The ETL Control database tracks everything:
+
+```
+ETL_Control Database
++-------------------+
+| ETL_BatchLog      |  <- Batch-level execution tracking
+| ETL_StepLog       |  <- Step-level logging (49 steps)
+| ETL_ErrorLog      |  <- Error capture with OnError handlers
+| ETL_Watermark     |  <- Incremental load change detection
+| ETL_Configuration |  <- Runtime parameters
++-------------------+
+
+Pipeline Flow:  Init Batch -> Staging(9) -> Hubs(9) -> SATs(9) -> Links(5) -> Silver(6) -> Gold(11) -> Close Batch
+```
+
+---
+
+## Data Vault 2.0 Modeling
+
+The implementation follows the DV2 standard from Linstedt & Olschimke (2015):
+
+- Hubs store business keys with SHA-256 hash keys (`HK_*` columns)
+- Satellites store descriptive attributes with HashDiff change detection and SCD Type 2 history
+- Links capture relationships between Hubs using composite hash keys
+
+Example:
+
+```sql
+-- Hub: Business key storage
+HUB_Taxpayer (HK_Taxpayer, TaxID, LoadDateTime, RecordSource)
+
+-- Satellite: Descriptive attributes with full history
+SAT_Taxpayer (HK_Taxpayer, LoadDateTime, HashDiff, BusinessName, CategoryID, ...)
+
+-- Link: Relationship between Hubs
+LNK_Declaration_Taxpayer (HK_Declaration_Taxpayer, HK_MonthlyDeclaration, HK_Taxpayer, ...)
+```
+
+Incremental loading uses watermarks:
+
+```sql
+-- ETL_Watermark tracks MAX(ModifiedDate) per table
+-- Only changed records are extracted each cycle
+WHERE ModifiedDate > @LastWatermark AND ModifiedDate <= @CurrentWatermark
+```
+
+---
+
+## Proof-of-Concept Results
+
+These four POC demonstrations correspond to Chapter 5, Section 5.2 of the thesis.
+
+**Challenge 1 — Schema Rigidity:**
+Traditional star schema needs ALTER TABLE when source systems change. With DV2, I just created a new Satellite. Result: 0 out of 67 existing objects modified, 0 out of 60 SSIS packages changed.
+
+**Challenge 2 — Historical Tracking:**
+SCD Type 1 overwrites previous values with no audit trail. DV2 Satellites are insert-only with HashDiff and timestamps. All 3 test versions were preserved (revenue: 200K → 350K → 505K).
+
+**Challenge 3 — Scalable ETL with Error Recovery:**
+Monolithic pipelines have no step-level recovery. The ETL Control framework logs each step separately with BatchLog/StepLog/ErrorLog. In testing, 7 out of 8 steps recovered and 45,065 rows were processed despite 1 deliberate failure.
+
+**Challenge 4 — Business Rules Separation:**
+Raw data and derived metrics are often mixed together. The Silver Business Vault layer computes compliance scores separately from the raw vault. Result: compliance score 72.5%, risk level MEDIUM for taxpayer TAX000001.
+
+---
+
+## Project Structure
 
 ```
 dv2-tax-data-warehouse-using-medallion/
-│
-├── DV2_TaxSystem/                              # SSIS Project (Visual Studio 2026)
-│   ├── DataVaultDWH_TaxSystem.dtproj           #   Project file
-│   ├── DataVaultDWH_TaxSystem.slnx             #   Solution file
-│   ├── DataVaultDWH_TaxSystem.database         #   Database reference
-│   ├── Project.params                          #   SSIS project parameters
-│   │
-│   ├── CM_TaxSystemDB.conmgr                   # 7 Connection Managers
-│   ├── CM_ETL_Control.conmgr                   #   ETL Control database
-│   ├── CM_ETL_Control_OnError.conmgr           #   Separate connection for OnError handlers
-│   ├── CM_DV_Staging.conmgr                    #   Staging database
-│   ├── CM_DV_Bronze.conmgr                     #   Bronze database
-│   ├── CM_DV_Silver.conmgr                     #   Silver database
-│   ├── CM_DV_Gold.conmgr                       #   Gold database
-│   │
-│   ├── Master_Complete_Pipeline.dtsx           # 3 Master Packages
-│   ├── Master_Full_Load.dtsx                   #   Full load pipeline
-│   ├── Master_Incremental_Load.dtsx            #   Incremental load pipeline
-│   │
-│   ├── STG_Full_Load_All.dtsx                  # Staging Layer (9 child + 2 orchestrator)
-│   ├── STG_Incremental_Load_All.dtsx           #
-│   ├── STG_Category.dtsx                       #
-│   ├── STG_Structure.dtsx                      #
-│   ├── STG_Activity.dtsx                       #
-│   ├── STG_Taxpayer.dtsx                       #
-│   ├── STG_Owner.dtsx                          #
-│   ├── STG_Officer.dtsx                        #
-│   ├── STG_MonthlyDeclaration.dtsx             #
-│   ├── STG_AnnualDeclaration.dtsx              #
-│   ├── STG_Payment.dtsx                        #
-│   │
-│   ├── BRZ_Load_All_Hubs.dtsx                  # Bronze Layer (23 child + 3 orchestrator)
-│   ├── BRZ_Load_All_Satellites.dtsx            #
-│   ├── BRZ_Load_All_Links.dtsx                 #
-│   ├── BRZ_HUB_Category.dtsx                   #   9 Hub packages
-│   ├── BRZ_HUB_Structure.dtsx                  #
-│   ├── BRZ_HUB_Activity.dtsx                   #
-│   ├── BRZ_HUB_Taxpayer.dtsx                   #
-│   ├── BRZ_HUB_Owner.dtsx                      #
-│   ├── BRZ_HUB_Officer.dtsx                    #
-│   ├── BRZ_HUB_Declaration.dtsx                #
-│   ├── BRZ_HUB_AnnualDeclaration.dtsx          #
-│   ├── BRZ_HUB_Payment.dtsx                    #
-│   ├── BRZ_SAT_Category.dtsx                   #   9 Satellite packages
-│   ├── BRZ_SAT_Structure.dtsx                  #
-│   ├── BRZ_SAT_Activity.dtsx                   #
-│   ├── BRZ_SAT_Taxpayer.dtsx                   #
-│   ├── BRZ_SAT_Owner.dtsx                      #
-│   ├── BRZ_SAT_Officer.dtsx                    #
-│   ├── BRZ_SAT_MonthlyDecl.dtsx                #
-│   ├── BRZ_SAT_AnnualDecl.dtsx                 #
-│   ├── BRZ_SAT_Payment.dtsx                    #
-│   ├── BRZ_LNK_TaxpayerDeclaration.dtsx        #   5 Link packages
-│   ├── BRZ_LNK_DeclarationPayment.dtsx         #
-│   ├── BRZ_LNK_TaxpayerOfficer.dtsx            #
-│   ├── BRZ_LNK_TaxpayerOwner.dtsx              #
-│   ├── BRZ_LNK_TaxpayerAnnualDecl.dtsx         #
-│   │
-│   ├── SLV_Load_All.dtsx                       # Silver Layer (6 child + 1 orchestrator)
-│   ├── SLV_PIT_Taxpayer.dtsx                   #   3 Point-in-Time packages
-│   ├── SLV_PIT_Declaration.dtsx                #
-│   ├── SLV_PIT_Payment.dtsx                    #
-│   ├── SLV_BRG_Taxpayer_Owner.dtsx             #   1 Bridge package
-│   ├── SLV_BUS_ComplianceScore.dtsx            #   2 Business Vault packages
-│   ├── SLV_BUS_MonthlyMetrics.dtsx             #
-│   │
-│   ├── GLD_Load_All_Dimentions.dtsx            # Gold Layer (11 child + 2 orchestrator)
-│   ├── GLD_Load_All_Facts.dtsx                 #
-│   ├── GLD_DIM_Category.dtsx                   #   7 Dimension packages (5 SCD1 + 2 SCD2)
-│   ├── GLD_DIM_Structure.dtsx                  #
-│   ├── GLD_DIM_Activity.dtsx                   #
-│   ├── GLD_DIM_PaymentMethod.dtsx              #
-│   ├── GLD_DIM_Status.dtsx                     #
-│   ├── GLD_DIM_Taxpayer.dtsx                   #   SCD Type 2
-│   ├── GLD_DIM_Officer.dtsx                    #   SCD Type 2
-│   ├── GLD_FACT_MonthlyDeclaration.dtsx        #   4 Fact packages
-│   ├── GLD_FACT_Payment.dtsx                   #
-│   ├── GLD_FACT_MonthlySnapshot.dtsx           #
-│   └── GLD_FACT_DeclarationLifecycle.dtsx      #
-│
-├── Scripts/
-│   ├── sql-scripts/                            # Core SQL scripts (execute in numerical order)
-│   │   ├── 00_CleanAll_FreshFullLoad.sql        #   Reset all 6 databases for fresh start
-│   │   ├── 01_CreateDatabaseStructure.sql       #   Source database (TaxSystemDB) DDL
-│   │   ├── 02_TransactionData.sql               #   Sample data generation (1,000 taxpayers)
-│   │   ├── 03_ETL_Control_Setup.sql             #   ETL Control framework (9 tables, stored procs)
-│   │   └── 04_DDL_Architecture_DW.sql           #   Data warehouse DDL (49 tables across 4 layers)
-│   │
-│   └── verification/                           # Testing, validation, and POC scripts
-│       ├── 10_Verify_FullLoad.sql               #   Full load verification queries
-│       ├── 11_Verify_IncrementalLoad.sql        #   Incremental load verification queries
-│       ├── 11_Verify_IncrementalLoad_Clean.sql  #   Clean output for thesis screenshots
-│       ├── 12_IncrementalTest_SourceChanges.sql #   Delta test data (updates + inserts)
-│       ├── 13_POC_Demonstrations.sql            #   All 4 POC demonstrations (Chapter 5)
-│       └── Source_Database_Verification.sql     #   12-point source database validation
-│
-├── Documents/                                  # Thesis documents (PDF format)
-│   ├── Final_Report.pdf                         #   Complete thesis (6 chapters)
-│   ├── Final_Presentation.pdf                   #   Defense presentation (13 slides)
-│   ├── Technical_Implementation_Guide.pdf       #   SSIS package build guide
-│   ├── Deployment_Operations_Guide.pdf          #   Google Cloud VM deployment + performance benchmarks
-│   ├── POC_Implementation_Guide.pdf             #   Step-by-step POC demonstration guide
-│   ├── Source_Database_Verification.pdf         #   Source DB verification (12-point checklist)
-│   └── BigData_5V.pdf                           #   Big Data 5V reference diagram
-│
-├── Figures/                                    # Chapter 5 POC evidence screenshots
-│   ├── Figure_5.1_Schema_Flexibility.png        #   Challenge 1: Zero-impact schema evolution
-│   ├── Figure_5.2_Historical_Tracking.png       #   Challenge 2: Insert-only audit trail
-│   ├── Figure_5.3_ETL_Control_Framework.png     #   Challenge 3: Step-level error recovery
-│   └── Figure_5.4_Business_Rules.png            #   Challenge 4: Business Vault derivation
-│
-├── .gitignore
-├── LICENSE                                     # MIT License
-└── README.md
+|
++-- DV2_TaxSystem/                    # SSIS Project (Visual Studio 2026)
+|   +-- DataVaultDWH_TaxSystem.dtproj
+|   +-- Master_Complete_Pipeline.dtsx # Master orchestration
+|   +-- STG_*.dtsx                    # Staging layer packages (9)
+|   +-- BRZ_HUB_*.dtsx               # Bronze Hub packages (9)
+|   +-- BRZ_SAT_*.dtsx               # Bronze Satellite packages (9)
+|   +-- BRZ_LNK_*.dtsx               # Bronze Link packages (5)
+|   +-- SLV_*.dtsx                    # Silver layer packages (6)
+|   +-- GLD_DIM_*.dtsx                # Gold Dimension packages (7)
+|   +-- GLD_FACT_*.dtsx               # Gold Fact packages (4)
+|
++-- Scripts/
+|   +-- sql-scripts/                  # Core setup (execute in order)
+|   |   +-- 00_CleanAll_FreshFullLoad.sql
+|   |   +-- 01_CreateDatabaseStructure.sql
+|   |   +-- 02_TransactionData.sql
+|   |   +-- 03_ETL_Control_Setup.sql
+|   |   +-- 04_DDL_Architecture_DW.sql
+|   |
+|   +-- verification/                 # Testing and validation
+|       +-- 10_Verify_FullLoad.sql
+|       +-- 11_Verify_IncrementalLoad.sql
+|       +-- 12_IncrementalTest_SourceChanges.sql
+|       +-- 13_POC_Demonstrations.sql
+|       +-- Source_Database_Verification.sql
+|
++-- Documents/                        # PDF thesis documents
+|   +-- Final_Report.pdf
+|   +-- Final_Presentation.pdf
+|   +-- Technical_Implementation_Guide.pdf
+|   +-- POC_Implementation_Guide.pdf
+|   +-- Source_Database_Verification.pdf
+|   +-- Deployment_Operations_Guide.pdf
+|
++-- Figures/                          # POC evidence screenshots
+    +-- Figure_5.1_Schema_Flexibility.png
+    +-- Figure_5.2_Historical_Tracking.png
+    +-- Figure_5.3_ETL_Control_Framework.png
+    +-- Figure_5.4_Business_Rules.png
 ```
 
 ---
 
-## Quick Start
+## How to Set Up
 
 ### Prerequisites
 
-- **SQL Server 2025** Developer or Enterprise Edition
-- **SQL Server Management Studio (SSMS)**
-- **Visual Studio 2026** with SQL Server Integration Services (SSIS 2022+) extension
-- Minimum 8 GB RAM, 20 GB free disk space
+- SQL Server 2025 Developer Edition (or 2019+)
+- Visual Studio 2022/2026 with SSIS extension
+- SQL Server Management Studio (SSMS)
 
-### Step 1: Create Databases and Load Source Data
+### Steps
 
-Execute the SQL scripts in SSMS in numerical order:
+1. Create the source database and tables:
+   ```
+   sqlcmd -i Scripts/sql-scripts/01_CreateDatabaseStructure.sql
+   ```
 
-```sql
--- 1. Create the source database schema
--- Execute: Scripts/sql-scripts/01_CreateDatabaseStructure.sql
+2. Generate sample tax data (58,813 records):
+   ```
+   sqlcmd -i Scripts/sql-scripts/02_TransactionData.sql
+   ```
 
--- 2. Generate sample tax data (1,000 taxpayers, 4 years)
--- Execute: Scripts/sql-scripts/02_TransactionData.sql
+3. Set up the ETL Control framework:
+   ```
+   sqlcmd -i Scripts/sql-scripts/03_ETL_Control_Setup.sql
+   ```
 
--- 3. Create ETL control framework (logging, watermarks, error handling)
--- Execute: Scripts/sql-scripts/03_ETL_Control_Setup.sql
+4. Create the Data Warehouse schema (Bronze/Silver/Gold):
+   ```
+   sqlcmd -i Scripts/sql-scripts/04_DDL_Architecture_DW.sql
+   ```
 
--- 4. Create data warehouse databases (Staging, Bronze, Silver, Gold — 49 tables)
--- Execute: Scripts/sql-scripts/04_DDL_Architecture_DW.sql
-```
+5. Open `DV2_TaxSystem/DataVaultDWH_TaxSystem.dtproj` in Visual Studio, then execute `Master_Complete_Pipeline.dtsx`.
 
-### Step 2: Run the ETL Pipeline
+### Verification
 
-Open the SSIS project in Visual Studio and execute the master package:
-
-1. **Full Load** (first-time load of all data):
-   - Open `DV2_TaxSystem/DataVaultDWH_TaxSystem.dtproj` in Visual Studio
-   - Run `Master_Complete_Pipeline.dtsx` — automatically selects the Full Load path
-   - All 49 steps execute across Staging → Bronze → Silver → Gold
-
-2. **Incremental Load** (delta changes only):
-   - Apply test changes: run `Scripts/verification/12_IncrementalTest_SourceChanges.sql` in SSMS
-   - Run `Master_Complete_Pipeline.dtsx` — automatically selects the Incremental Load path
-   - Watermark-based delta extraction processes only changed records
-
-### Step 3: Verify Results
-
-```sql
--- After Full Load
--- Execute: Scripts/verification/10_Verify_FullLoad.sql
-
--- After Incremental Load
--- Execute: Scripts/verification/11_Verify_IncrementalLoad.sql
-
--- Source Database Validation (12-point checklist)
--- Execute: Scripts/verification/Source_Database_Verification.sql
-
--- POC Demonstrations (Chapter 5 evidence)
--- Execute: Scripts/verification/13_POC_Demonstrations.sql
-```
-
-### Fresh Restart
-
-To reset all databases and start over:
-
-```sql
--- WARNING: Deletes ALL data across all 6 databases
--- Execute: Scripts/sql-scripts/00_CleanAll_FreshFullLoad.sql
-```
-
-> For detailed SSIS package configuration and build instructions, see [Technical Implementation Guide](Documents/Technical_Implementation_Guide.docx).
-
----
-
-## Architecture Details
-
-### Six Databases
-
-| Database | Layer | Purpose | Objects |
-|----------|-------|---------|---------|
-| **TaxSystemDB** | Source | Simulated Cambodia tax system | 9 tables, 58,813 records |
-| **ETL_Control** | Control | Pipeline orchestration and monitoring | 5 active + 4 framework tables |
-| **DV_Staging** | Staging | Landing zone (truncate-reload / watermark delta) | 9 staging tables |
-| **DV_Bronze** | Bronze | Raw Data Vault (insert-only, full history) | 9 Hubs, 9 Satellites, 5 Links |
-| **DV_Silver** | Silver | Business Vault (derived rules and metrics) | 3 PIT, 1 Bridge, 2 Business tables |
-| **DV_Gold** | Gold | Star Schema (BI-ready dimensional model) | 7 Dimensions, 4 Fact tables |
-
-### ETL Control Framework
-
-The ETL_Control database provides centralized pipeline management:
-
-- **ETL_Process** — Registry of ETL processes with source/target mappings
-- **ETL_BatchLog** — Batch-level execution tracking (start, end, status, record counts)
-- **ETL_StepLog** — Step-level logging for each of 49 pipeline steps
-- **ETL_ErrorLog** — Detailed error capture via SSIS OnError Event Handlers (severity, source, message)
-- **ETL_Watermark** — High-water mark values for incremental loading per table
-
-### SSIS Package Hierarchy
+After running the pipeline, check the results:
 
 ```
-Master_Complete_Pipeline.dtsx                    ← Entry point (evaluates load type)
-├── [FULL] → Master_Full_Load.dtsx
-│   ├── STG_Full_Load_All.dtsx          → 9 staging child packages
-│   ├── BRZ_Load_All_Hubs.dtsx          → 9 hub child packages
-│   ├── BRZ_Load_All_Satellites.dtsx    → 9 satellite child packages
-│   ├── BRZ_Load_All_Links.dtsx         → 5 link child packages
-│   ├── SLV_Load_All.dtsx              → 6 silver child packages
-│   ├── GLD_Load_All_Dimentions.dtsx   → 7 dimension child packages
-│   └── GLD_Load_All_Facts.dtsx        → 4 fact child packages
-│
-└── [INCREMENTAL] → Master_Incremental_Load.dtsx
-    └── (same orchestrator → child structure, watermark-based delta)
-
-Total: 3 master + 8 orchestrator + 49 child = 60 SSIS packages
+sqlcmd -i Scripts/verification/10_Verify_FullLoad.sql
+sqlcmd -i Scripts/verification/13_POC_Demonstrations.sql
 ```
-
-### Data Vault 2.0 Pattern
-
-- **Hubs**: Unique business keys with SHA-256 hash keys — insert-only, never updated
-- **Satellites**: Descriptive attributes with HashDiff change detection — new row per change, end-dated
-- **Links**: Relationships between Hubs — insert-only composite hash keys
-- **PIT Tables**: Point-in-Time snapshots for efficient temporal queries
-- **Bridge Table**: Pre-joined Taxpayer-Owner relationships with current attributes
-- **Business Vault**: Derived metrics (ComplianceScore 0–100, MonthlyMetrics aggregations)
-
----
-
-## Cloud Deployment
-
-The project is deployed on a **Google Cloud Platform** VM for consistent, reproducible benchmark results. See the [Deployment & Operations Guide](Documents/Deployment_Operations_Guide.pdf) for step-by-step instructions.
-
-### VM Specification
-
-| Component | Specification |
-|-----------|--------------|
-| VM Name | dv2-tax-system |
-| Machine Type | e2-standard-4 (4 vCPUs, 2 cores, 16 GB RAM) |
-| Region / Zone | asia-southeast1-a (Singapore) |
-| OS | Windows Server 2025 Datacenter |
-| Storage | 128 GB SSD persistent disk |
-| Cost | ~$0.38/hour (covered by Google Cloud Free Trial $300 credit) |
-
-### Deployment Phases
-
-- **Phase A** (Sections 1-7): VM creation, SQL Server + SSMS + Visual Studio installation, database deployment, SSIS project setup, advisor access configuration
-- **Phase B** (Sections 8-13): Performance benchmarks, full/incremental load testing, query performance comparison, scalability analysis
-
-> **Cost tip**: Always stop the VM from Google Cloud Console when not in use. For benchmark usage (~3-5 hours total), actual cost is only $1-2.
-
----
-
-## Performance Benchmarks
-
-All benchmarks were captured on the Google Cloud VM for reproducibility. Full details in the [Deployment & Operations Guide](Documents/Deployment_Operations_Guide.pdf), Phase B.
-
-### ETL Pipeline Execution Time (Table 5.1)
-
-| Layer | Objects | Full Load (sec) | Incremental (sec) | Records (Full / Incr) |
-|-------|---------|-----------------|--------------------|-----------------------|
-| Staging | 9 | 10.6 | 23.8 | 58,800 / 58,813 |
-| Bronze | 23 | 43.3 | 39.4 | 184,068 / 50 |
-| Silver | 6 | 6.3 | 6.2 | 2,000 / 57,174 |
-| Gold | 11 | 27.1 | 24.5 | 91,738 / 90,721 |
-| **TOTAL** | **49** | **91.6** | **97.7** | **336,606 / 206,758** |
-
-### Query Performance: Gold Star Schema vs Raw Vault (Table 5.2)
-
-| Complexity | Query Description | Gold (ms) | Raw Vault (ms) | Joins | Speedup |
-|------------|-------------------|-----------|----------------|-------|---------|
-| Simple | Tax by Category | 11.5 | 130.6 | 2 vs 7 | 11.4x |
-| Medium | Top Taxpayers by Payment | 31.3 | 80.5 | 4 vs 8 | 2.6x |
-| Complex | Monthly Revenue Trend | 64.6 | 151.9 | 6 vs 10 | 2.4x |
-
----
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| [Final Report](Documents/Final_Report.pdf) | Complete 6-chapter thesis |
-| [Final Presentation](Documents/Final_Presentation.pdf) | Defense presentation with speaker notes |
-| [Technical Implementation Guide](Documents/Technical_Implementation_Guide.pdf) | Step-by-step SSIS package build and configuration guide |
-| [Deployment & Operations Guide](Documents/Deployment_Operations_Guide.pdf) | Google Cloud VM deployment (Phase A) + performance benchmarks (Phase B) |
-| [POC Implementation Guide](Documents/POC_Implementation_Guide.pdf) | Reproducible SQL scripts for 4 POC demonstrations |
-| [Source Database Verification](Documents/Source_Database_Verification.pdf) | 12-point source database validation with SSMS screenshots |
 
 ---
 
 ## Technology Stack
 
-| Component | Version / Detail |
-|-----------|-----------------|
-| Database Engine | SQL Server 2025 Developer Edition (RTM v17.0.1000.7) |
-| ETL Tool | SQL Server Integration Services (SSIS) 2022 |
-| IDE | Visual Studio 2026 Community + SSIS Extension |
-| Management | SQL Server Management Studio (SSMS) |
-| Deployment | Google Cloud Platform e2-standard-4 VM (4 vCPU, 16 GB RAM, 128 GB SSD) |
-| Region | asia-southeast1-a (Singapore) |
-| OS | Windows Server 2025 Datacenter |
-| Methodology | Data Vault 2.0 (Linstedt & Olschimke, 2015) |
-| Architecture | Medallion (Staging → Bronze → Silver → Gold) |
-| Hash Algorithm | SHA-256 via HASHBYTES('SHA2_256'), stored as VARBINARY(32) |
-| SQL Server Memory | 12 GB (of 16 GB) — configured via `sp_configure 'max server memory'` |
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Database Engine | Microsoft SQL Server | 2025 Developer Edition |
+| ETL Tool | SQL Server Integration Services (SSIS) | Included with SQL Server |
+| Development IDE | Visual Studio Community | 2026 |
+| Scripting | T-SQL | - |
+| Job Scheduling | SQL Server Agent | Included |
+| Cloud Platform | Google Cloud Compute Engine | e2-standard-4 |
+| OS | Windows Server 2025 Datacenter | - |
+
+All tools used are free or included with SQL Server — no extra licenses needed.
 
 ---
+
+## Performance
+
+| Operation | Time | Notes |
+|-----------|------|-------|
+| Full Load (49 steps) | 91.6 sec | All 58,813 records across 4 layers |
+| Incremental Load | 97.7 sec | Delta extraction via watermark |
+| Gold Query (Revenue Trends) | 0.12 sec | vs 0.29 sec on Raw Vault (2.4x faster) |
+| Gold Query (Compliance) | 0.08 sec | vs 0.91 sec on Raw Vault (11.4x faster) |
+
+---
+
+## Documents
+
+| Document | Description |
+|----------|-------------|
+| [Final Report](Documents/Final_Report.pdf) | Complete thesis — 6 chapters, 55 pages |
+| [Final Presentation](Documents/Final_Presentation.pdf) | Defense slides, 20 slides |
+| [Technical Implementation Guide](Documents/Technical_Implementation_Guide.pdf) | SSIS package inventory and deployment details |
+| [POC Implementation Guide](Documents/POC_Implementation_Guide.pdf) | SQL scripts to reproduce all POC demos |
+| [Source Database Verification](Documents/Source_Database_Verification.pdf) | 12-point data quality checklist |
+| [Deployment Operations Guide](Documents/Deployment_Operations_Guide.pdf) | Production deployment procedures |
+
+---
+
+## Citation
+
+If you use this work in your research:
+
+```bibtex
+@mastersthesis{so2026dv2,
+  title     = {Data Vault 2.0 Implementation for Cambodia Tax System Data Warehouse Using Medallion Architecture},
+  author    = {So, Sot},
+  year      = {2026},
+  school    = {Royal University of Phnom Penh},
+  type      = {Master's Thesis},
+  program   = {Master of Science in Data Science and Engineering},
+  note      = {Supervisor: Mr. Chap Chanpiseth}
+}
+```
 
 ## References
 
-This implementation is based on:
-
 - Linstedt, D. & Olschimke, M. (2015). *Building a Scalable Data Warehouse with Data Vault 2.0*. Morgan Kaufmann.
-- Hultgren, P. (2012). *Modeling the Agile Data Warehouse with Data Vault*. New Hamilton.
-- Kimball, R. & Ross, M. (2013). *The Data Warehouse Toolkit*, 3rd Edition. Wiley.
-- Databricks. (2025). *Medallion Lakehouse Architecture*. Databricks Documentation.
-- Microsoft. (2025). *Implement Medallion Lakehouse Architecture in Microsoft Fabric*. Microsoft Documentation.
-
-Full reference list (34 citations) available in the [Final Report](Documents/Final_Report.docx).
-
----
-
-## Author
-
-**Mr. Sot So**
-- Chief of Data Management Bureau, General Department of Taxation, Cambodia
-- Master of Science in Data Science and Engineering, Royal University of Phnom Penh
-
-**Supervisor:** Mr. Chap Chanpiseth
+- [Databricks Medallion Architecture](https://docs.databricks.com/en/lakehouse/medallion.html)
+- [Scalefree Data Vault Alliance](https://www.scalefree.com/consulting/data-vault-2-0/)
+- [Microsoft SSIS Documentation](https://learn.microsoft.com/sql/integration-services)
 
 ---
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+MIT License — see [LICENSE](LICENSE).
 
----
+## Author
 
-## Disclaimer
+Sot So — MSc Data Science and Engineering, Royal University of Phnom Penh, Faculty of Engineering
 
-This is an academic proof-of-concept implementation. The tax data is **simulated** and does not contain any real taxpayer information. This project is a personal master's degree research project and is not affiliated with the General Department of Taxation's production systems.
+Supervisor: Mr. Chap Chanpiseth | March 2026
